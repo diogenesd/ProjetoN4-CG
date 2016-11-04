@@ -6,6 +6,7 @@ package n4;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -24,6 +25,7 @@ public class Main implements GLEventListener, KeyListener {
 	private Camera cameraPrincipal, cameraAux, cameraTemp;
 	private boolean camFocoPrincipal;
 	private StarShip starShip;
+	private Asteroid[] asteroids;
 
 	private float translacaoCubo1[] = { 0.0f, 0.0f, 0.0f };
 	private float escalaCubo1[]     = { 2.0f, 2.0f, 2.0f };
@@ -53,6 +55,20 @@ public class Main implements GLEventListener, KeyListener {
 		// INICIA NAVE
 		starShip = new StarShip();
 		starShip.atribuirGLs(gl,glut);
+		
+		// INICIA ASTEROID
+		asteroids = new Asteroid[3];
+		asteroids[0] = new Asteroid();
+		asteroids[1] = new Asteroid();
+		asteroids[2] = new Asteroid();		
+		
+		asteroids[0].atribuirGLs(gl, glut);
+		asteroids[1].atribuirGLs(gl, glut);
+		asteroids[2].atribuirGLs(gl, glut);
+		
+		asteroids[0].translacaoXYZ(4.0f, 0.0f, -10.0f);
+		asteroids[1].translacaoXYZ(-4.0f,0.0f, -10.0f);
+		asteroids[2].translacaoXYZ(-8.0f,0.0f, -10.0f);
 		
 		// ILUMINACAO
 		ligarLuz();
@@ -94,30 +110,16 @@ public class Main implements GLEventListener, KeyListener {
         
 		drawAxis();
 		//gl.glColor3f(1.0f, 0.0f, 0.0f);
-		//drawCube(translacaoCubo1,escalaCubo1);
 		starShip.drawCube();
-
+		asteroids[0].drawAsteroid();
+		asteroids[1].drawAsteroid();
+		asteroids[2].drawAsteroid();
+		
+		
 				
 		gl.glFlush();
 	}
 	
-	/*private void drawCube(float translacao[], float escala[]) {
-		if (eHMaterial) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corRed, 0);
-			gl.glEnable(GL.GL_LIGHTING);
-		}
-
-		gl.glPushMatrix();
-			gl.glScalef(escala[0],escala[1],escala[2]);
-			gl.glTranslated(translacao[0], translacao[1], translacao[2]);
-			glut.glutSolidCube(1.0f);
-		gl.glPopMatrix();
-		
-		if (eHMaterial) {
-			gl.glDisable(GL.GL_LIGHTING);
-		}
-	}*/
-
 	private void ligarLuz() {
 		if (eHMaterial) {
 			float posLight[] = { 5.0f, 5.0f, 10.0f, 0.0f };
@@ -149,8 +151,8 @@ public class Main implements GLEventListener, KeyListener {
 		case KeyEvent.VK_RIGHT: // MOVER DIREITA
 			System.out.println("	-- VK_RIGHT --	");
 			if (starShip != null) {
-				starShip.translacaoXYZ(2.0, 0.0, 0.0);
-				System.out.println("	-- (L)to: 2.0, 0.0, 0.0 --	");
+					starShip.translacaoXYZ(2.0, 0.0, 0.0);
+				System.out.println("	-- (L)to: 3.0, 0.0, 0.0 --	");
 			}
 			break;
 		case KeyEvent.VK_LEFT: // MOVER ESQUERDA
@@ -163,14 +165,14 @@ public class Main implements GLEventListener, KeyListener {
 		case KeyEvent.VK_UP: // MOVER CIMA
 			System.out.println("	-- VK_UP --	");
 			if (starShip != null) {
-				starShip.translacaoXYZ(0.0, 2.0, 0.0);
+				starShip.translacaoXYZ(0.0, 0.0, -1.0);
 				System.out.println("	-- (L)to: 0.0, 2.0, 0.0 --	");
 			}
 			break;
 		case KeyEvent.VK_DOWN: // MOVER BAIXO
 			System.out.println("	-- VK_DOWN --	");
 			if (starShip != null ) {
-				starShip.translacaoXYZ(0.0, -2.0, 0.0);
+				starShip.translacaoXYZ(0.0, 0.0, 1.0);
 				System.out.println("	-- (L)to: 0.0, -2.0, 0.0 --	");
 			}
 			break;
@@ -179,6 +181,36 @@ public class Main implements GLEventListener, KeyListener {
 			if (starShip != null ) {
 				//starShip.drawBbox();
 				//starShip.showBbox();
+			}
+			break;
+		case KeyEvent.VK_W: // MOVE ASTEROID UP
+			System.out.println("	-- VK_W --	");
+			if (asteroids != null ) {
+				//asteroid.translacaoXYZ(0.0f, 1.0f, 0.0f);
+			}
+			break;
+		case KeyEvent.VK_D: // MOVE ASTEROID RIGHT
+			System.out.println("	-- VK_D --	");
+			if (asteroids != null ) {
+				//asteroid.translacaoXYZ(1.0f, 0.0f, 0.0f);
+			}
+			break;
+		case KeyEvent.VK_S: // MOVE ASTEROID DOWN
+			System.out.println("	-- VK_S --	");
+			if (asteroids != null ) {
+				//asteroid.translacaoXYZ(0.0f, -1.0f, 0.0f);
+			}
+			break;
+		case KeyEvent.VK_A: // MOVE ASTEROID LEFT
+			System.out.println("	-- VK_A --	");
+			if (asteroids != null ) {
+				//asteroid.translacaoXYZ(-1.0f, 0.0f, 0.0f);
+			}
+			break;
+		case KeyEvent.VK_F1: // MOVE ASTEROID LEFT
+			System.out.println("	-- VK_F1 --	");
+			if (asteroids != null ) {
+				aleatorieAsteroid();
 			}
 			break;
 			
@@ -220,9 +252,6 @@ public class Main implements GLEventListener, KeyListener {
 		// TODO Auto-generated method stub
 
 	}
-
-	public void Debug() {
-	}
 	
 	private void changeCam(){
 		if(camFocoPrincipal){
@@ -260,6 +289,25 @@ public class Main implements GLEventListener, KeyListener {
 		
 		// CAMERA TEMP
 		this.cameraTemp = new Camera();
+	}
+
+	private void aleatorieAsteroid() {
+		new Thread(new Runnable() {											
+			@Override
+			public void run() {
+				while(true){
+					try {
+						asteroids[0].translacaoXYZ(0.0f, 0.0f, 1.0f);
+						asteroids[1].translacaoXYZ(0.0f, 0.0f, 1.0f);
+						asteroids[2].translacaoXYZ(0.0f, 0.0f, 1.0f);
+						glDrawable.display();
+						Thread.sleep(1000);									
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}										
+				}
+			}
+		}).start();
 	}
 	
 }
