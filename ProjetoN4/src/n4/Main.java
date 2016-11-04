@@ -151,14 +151,14 @@ public class Main implements GLEventListener, KeyListener {
 		case KeyEvent.VK_RIGHT: // MOVER DIREITA
 			System.out.println("	-- VK_RIGHT --	");
 			if (starShip != null) {
-					starShip.translacaoXYZ(2.0, 0.0, 0.0);
+					starShip.translacaoXYZ(1.0, 0.0, 0.0);
 				System.out.println("	-- (L)to: 3.0, 0.0, 0.0 --	");
 			}
 			break;
 		case KeyEvent.VK_LEFT: // MOVER ESQUERDA
 			System.out.println("	-- VK_LEFT --	");
 			if (starShip != null) {
-				starShip.translacaoXYZ(-2.0, 0.0, 0.0);
+				starShip.translacaoXYZ(-1.0, 0.0, 0.0);
 				System.out.println("	-- (L)to: -2.0, 0.0, 0.0 --	");
 			}
 			break;
@@ -174,37 +174,6 @@ public class Main implements GLEventListener, KeyListener {
 			if (starShip != null ) {
 				starShip.translacaoXYZ(0.0, 0.0, 1.0);
 				System.out.println("	-- (L)to: 0.0, -2.0, 0.0 --	");
-			}
-			break;
-		case KeyEvent.VK_0: // SHOW BBOX
-			System.out.println("	-- VK_0 --	");
-			if (starShip != null ) {
-				//starShip.drawBbox();
-				//starShip.showBbox();
-			}
-			break;
-		case KeyEvent.VK_W: // MOVE ASTEROID UP
-			System.out.println("	-- VK_W --	");
-			if (asteroids != null ) {
-				//asteroid.translacaoXYZ(0.0f, 1.0f, 0.0f);
-			}
-			break;
-		case KeyEvent.VK_D: // MOVE ASTEROID RIGHT
-			System.out.println("	-- VK_D --	");
-			if (asteroids != null ) {
-				//asteroid.translacaoXYZ(1.0f, 0.0f, 0.0f);
-			}
-			break;
-		case KeyEvent.VK_S: // MOVE ASTEROID DOWN
-			System.out.println("	-- VK_S --	");
-			if (asteroids != null ) {
-				//asteroid.translacaoXYZ(0.0f, -1.0f, 0.0f);
-			}
-			break;
-		case KeyEvent.VK_A: // MOVE ASTEROID LEFT
-			System.out.println("	-- VK_A --	");
-			if (asteroids != null ) {
-				//asteroid.translacaoXYZ(-1.0f, 0.0f, 0.0f);
 			}
 			break;
 		case KeyEvent.VK_F1: // MOVE ASTEROID LEFT
