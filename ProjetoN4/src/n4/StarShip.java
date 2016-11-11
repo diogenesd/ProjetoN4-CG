@@ -48,7 +48,7 @@ public class StarShip {
 		matrixObject.atribuirIdentidade();
 	}
 	
-	public void drawCube() {
+	public void drawStarShip() {
 		
 		if (eHMaterial) {
 			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corRed, 0);

@@ -58,14 +58,18 @@ public class Asteroid {
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
 			gl.glColor3f(0.0f, 1.0f, 0.0f); //VERDE
 			gl.glScalef(2.0f,2.0f,2.0f);
-			gl.glTranslated(0.0f, 0.0f, 0.0f);
-			glut.glutSolidCube(1.0f);
+			//gl.glTranslated(0.0f, 0.0f, 0.0f);
+			glut.glutSolidSphere(1.0f, 360, 360);	
 		gl.glPopMatrix();
 		
 		if (eHMaterial) {
 			gl.glDisable(GL.GL_LIGHTING);
 		}
 		
+	}
+	
+	public void randomPosition(double tx, double ty, double tz){
+		this.translacaoXYZ(tx, ty, tz);
 	}
 	
 	public void translacaoXYZ(double tx, double ty, double tz) {

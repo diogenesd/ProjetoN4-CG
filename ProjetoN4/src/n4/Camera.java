@@ -11,10 +11,15 @@ public class Camera {
 	private double xEye, yEye, zEye;
 	private double xCenter, yCenter, zCenter;
 	
+	
 	public Camera() {
 		super();
-		this.xEye = 0.0f; 			this.yEye = 20.0f; 			this.zEye = 20.0f;
+		this.xEye = 0.0f; 			this.yEye = 0.0f; 			this.zEye = 0.0f;
 		this.xCenter = 0.0f;		this.yCenter = 0.0f;		this.zCenter = 0.0f;
+	}
+	
+	public void translacaoXYZ(double tx, double ty, double tz) {	
+		this.xEye += tx; 			this.yEye += ty; 			this.zEye +=tz;
 	}
 
 	public double getxEye() {
