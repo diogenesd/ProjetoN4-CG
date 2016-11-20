@@ -1,10 +1,14 @@
 package n4;
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+
+import com.sun.opengl.util.Animator;
 
 public class Frame extends JFrame{
 
@@ -39,7 +43,11 @@ public class Frame extends JFrame{
 		add(canvas,BorderLayout.CENTER);
 		canvas.addGLEventListener(renderer);        
 		canvas.addKeyListener(renderer);
-		canvas.requestFocus();			
+		canvas.addMouseListener(renderer);
+		canvas.requestFocus();	
+	    final Animator animator = new Animator(canvas);
+	    animator.start();
+		
 	}		
 	
 	public static void main(String[] args) {

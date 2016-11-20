@@ -12,6 +12,7 @@ public class StarShip {
 	private float corRed[] = { 1.0f, 0.0f, 0.0f, 1.0f };
 	private n4.BoundingBox bBox;
 	public Transformacao4D matrixObject = new Transformacao4D();
+	
 	private static Transformacao4D matrizTmpTranslacao = new Transformacao4D();
 	private static Transformacao4D matrizTmpTranslacaoInversa = new Transformacao4D();
 	private static Transformacao4D matrizTmpEscala = new Transformacao4D();
@@ -58,7 +59,7 @@ public class StarShip {
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
 			gl.glScalef(2.0f,2.0f,2.0f);
 			gl.glTranslated(0.0f, 0.0f, 0.0f);
-			glut.glutSolidCube(1.0f);
+			glut.glutSolidCube(2.0f);
 		gl.glPopMatrix();
 		
 		if (eHMaterial) {
@@ -124,6 +125,7 @@ public class StarShip {
 	public void showMatrix() {
 		matrixObject.exibeMatriz();
 	}
+	
 	public Transformacao4D getMatrixObject() {
 		return this.matrixObject;
 	}
@@ -166,4 +168,6 @@ public class StarShip {
 	public n4.BoundingBox getBbox() {
 		return this.bBox;
 	}
+	
+	
 }

@@ -8,8 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.media.opengl.DebugGL;
@@ -19,12 +18,9 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 //import javax.media.opengl.glu.GLUquadric;
 
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.views.AbstractView;
-
 import com.sun.opengl.util.GLUT;
 
-public class Main implements GLEventListener, KeyListener, MouseListener, MouseMotionListener  {
+public class Main implements GLEventListener, KeyListener, MouseListener{
 	private GL gl;
 	private GLU glu;
 	private GLUT glut;
@@ -32,9 +28,12 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
 	private Camera cameraPrincipal, cameraAux, cameraTemp;
 	private boolean camFocoPrincipal;
 	private StarShip starShip;
-	private Asteroid[] asteroids;
-	private Bullet bullet;
-
+	private ArrayList<Asteroid> asteroids;
+	private ArrayList<Bullet> bullets;
+	private ArrayList<Bullet> shots;
+	
+	private int starSp;
+	private Random random = new Random();
     
     private boolean eHMaterial = true;
 
@@ -51,13 +50,36 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
 		initCameras();
 		
 		// INICIA NAVE
-		initStarShip();
+	    starSp = gl.glGenLists(1);
+	    gl.glNewList(starSp, GL.GL_COMPILE);
+		    initStarShip();
+	    gl.glEndList();
+		
 		
 		// INICIA ASTEROID
-		initAsteroids();
+	    asteroids = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+		    initAsteroids();
+		}
+		for (Asteroid asteroid : asteroids) {
+		    gl.glNewList(asteroid.getId(), GL.GL_COMPILE);
+		    	asteroid.translacaoXYZ(random.nextInt(20), 0.0f , -20.0f);
+		    	asteroid.drawAsteroid();
+		    gl.glEndList();
+		}
+	    
 		
 		// INICIA BALAS
-		initBullet();
+		bullets = new ArrayList<>();
+		shots = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			initBullet();
+		}
+		for (Bullet bullet : bullets) {
+	    	gl.glNewList(bullet.getId(), GL.GL_COMPILE);
+	    		bullet.drawBullet();
+	    	gl.glEndList();
+	    }
 		
 		// ILUMINACAO
 		ligarLuz();
@@ -90,6 +112,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
 		//glu.gluLookAt(xEye, yEye, zEye, xCenter, yCenter, zCenter, 0.0f, 1.0f, 0.0f);
+        
+        if(camFocoPrincipal){
         glu.gluLookAt(this.cameraPrincipal.getxEye(), // Configuração da camera no viewPort
         		this.cameraPrincipal.getyEye(),
         		this.cameraPrincipal.getzEye(),
@@ -97,23 +121,62 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
         		this.cameraPrincipal.getyCenter(),
         		this.cameraPrincipal.getzCenter(),
         		0.0f, 1.0f, 0.0f);
-        
-        
+        }else{
+		        this.cameraAux.setxEye(starShip.getMatrixObject().GetElement(12));
+		        this.cameraAux.setyEye(starShip.getMatrixObject().GetElement(13));
+		        this.cameraAux.setzEye(starShip.getMatrixObject().GetElement(14));
+		        this.cameraAux.setxCenter(starShip.getMatrixObject().GetElement(12));
+		        this.cameraAux.setyCenter(starShip.getMatrixObject().GetElement(13));
+		        this.cameraAux.setzCenter(starShip.getMatrixObject().GetElement(14) - 60);
+		        glu.gluLookAt(this.cameraAux.getxEye(), // Configuração da camera no viewPort
+		        		this.cameraAux.getyEye(),
+		        		this.cameraAux.getzEye(),
+		        		this.cameraAux.getxCenter(), 
+		        		this.cameraAux.getyCenter(),
+		        		this.cameraAux.getzCenter(),
+		        		0.0f, 1.0f, 0.0f);
+        }
         // DESENHA ESPAÇO
 		drawAxis();
 		
 		//DESENHA STARSHIP
-		starShip.drawStarShip();
 		
-		
-		// DESENHA ASTEROIDS
-		for (Asteroid asteroid : asteroids) {
-			asteroid.drawAsteroid();
-		}
+		 gl.glPushMatrix();
+			    gl.glPushMatrix();
+			    gl.glTranslated(
+			    		starShip.getMatrixObject().GetElement(12),
+			    		starShip.getMatrixObject().GetElement(13),
+			    		starShip.getMatrixObject().GetElement(14));
+			    gl.glCallList(starSp); // Display List
+			    gl.glPopMatrix();
+			
+			// DESENHA ASTEROIDS
+			    for (Asteroid asteroid : asteroids) {
+			    	gl.glPushMatrix();
+					    gl.glTranslated( 0.0f , 0.0f , asteroid.getMoveAsteroid());
+					    gl.glCallList(asteroid.getId()); // Display List
+				    gl.glPopMatrix();
+				}
+			    
+			// DESENHA BULLETS
+			    for (Bullet bullet : shots) {
+					gl.glPushMatrix();
+						gl.glTranslated(
+								bullet.getMatrixObject().GetElement(12),
+								bullet.getMatrixObject().GetElement(13),
+								bullet.getMatrixObject().GetElement(14) - bullet.getMoveBullet());
+						
+						gl.glCallList(bullet.getId()); // Display List
+					gl.glPopMatrix();
+			    }
+			    
+		 gl.glPopMatrix();
+		    
 				
 		gl.glFlush();
 	}
-	
+
+
 	private void ligarLuz() {
 		if (eHMaterial) {
 			float posLight[] = { 5.0f, 5.0f, 10.0f, 0.0f };
@@ -162,64 +225,62 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
 			System.out.println("	-- VK_RIGHT --	");
 			if (starShip != null) {
 					starShip.translacaoXYZ(1.0, 0.0, 0.0);
-				System.out.println("	-- (L)to: 3.0, 0.0, 0.0 --	");
+				System.out.println("	-- (L)to: 1.0, 0.0, 0.0 --	");
 			}
 			break;
 		case KeyEvent.VK_LEFT: // MOVER ESQUERDA
 			System.out.println("	-- VK_LEFT --	");
 			if (starShip != null) {
 				starShip.translacaoXYZ(-1.0, 0.0, 0.0);
-				System.out.println("	-- (L)to: -2.0, 0.0, 0.0 --	");
+				System.out.println("	-- (L)to: -1.0, 0.0, 0.0 --	");
 			}
 			break;
 		case KeyEvent.VK_UP: // MOVER CIMA
 			System.out.println("	-- VK_UP --	");
 			if (starShip != null) {
 				starShip.translacaoXYZ(0.0, 0.0, -1.0);
-				System.out.println("	-- (L)to: 0.0, 2.0, 0.0 --	");
+				System.out.println("	-- (L)to: 0.0, 0.0, -1.0 --	");
 			}
 			break;
 		case KeyEvent.VK_DOWN: // MOVER BAIXO
 			System.out.println("	-- VK_DOWN --	");
 			if (starShip != null ) {
 				starShip.translacaoXYZ(0.0, 0.0, 1.0);
-				System.out.println("	-- (L)to: 0.0, -2.0, 0.0 --	");
+				System.out.println("	-- (L)to: 0.0, 0.0, 1.0--	");
 			}
 			break;
 			
 		case KeyEvent.VK_ENTER: // MOVE ASTEROID ALEATORIOS
 			System.out.println("	-- VK_ENTER --	");
-			if (asteroids != null ) {
-				aleatorieAsteroid();
+			if (!asteroids.isEmpty()) {
+				for (Asteroid asteroid : asteroids) {
+					//Asteroid.moveAsteroid(glDrawable, asteroid, 10);
+				}
+				
 			}
 			break;
 			
-		}
+		case KeyEvent.VK_F: // MOVE ASTEROID ALEATORIOS
+			System.out.println("	-- VK_F --	");
+			
+			if(!bullets.isEmpty()){
+				
+				Bullet b = bullets.get(0);
+				bullets.remove(0);
+				b.setMatrix(starShip.getMatrixObject());
+				shots.add(b);
+				
+				
+				}
+			break;
 		
+		case KeyEvent.VK_1: // MOVE ASTEROID ALEATORIOS
+			starShip.showMatrix();				
+			break;
+		}
+	
 		glDrawable.display();	
 	}
-
-	
-	private void aleatorieAsteroid() {
-			new Thread(new Runnable() {											
-				@Override
-				public void run() {
-					while(true){
-						try {
-							for (Asteroid asteroid : asteroids) {
-								System.out.println(asteroids.length);
-								asteroid.translacaoXYZ(0.0f, 0.0f, 1.0f);
-							}
-							glDrawable.display();
-							Thread.sleep(500);	
-								
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}										
-					}
-				}
-			}).start();
-		}
 
 	public void drawAxis() {
 		// eixo X - Red
@@ -274,8 +335,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
 		// CAMERA CENTRAL
 		this.cameraPrincipal = new Camera();
 		this.cameraPrincipal.setxEye(0.0f);
-		this.cameraPrincipal.setyEye(20.0f);
-		this.cameraPrincipal.setzEye(20.0f);
+		this.cameraPrincipal.setyEye(40.0f);
+		this.cameraPrincipal.setzEye(40.0f);
 		this.cameraPrincipal.setxCenter(0.0f);
 		this.cameraPrincipal.setyCenter(0.0f);
 		this.cameraPrincipal.setzCenter(0.0f);
@@ -295,74 +356,42 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
 	}
 	
 	private void initAsteroids() {
-		asteroids = new Asteroid[3];
-		asteroids[0] = new Asteroid();
-		asteroids[1] = new Asteroid();
-		asteroids[2] = new Asteroid();		
+			Asteroid a = new Asteroid();
+			a.atribuirGLs(gl, glut);
+			a.setId(gl.glGenLists(1));
+			asteroids.add(a);
 		
-		asteroids[0].atribuirGLs(gl, glut);
-		asteroids[1].atribuirGLs(gl, glut);
-		asteroids[2].atribuirGLs(gl, glut);
-		
-		Random r = new Random();
-		for (Asteroid asteroid : asteroids) {
-			asteroid.randomPosition(
-					 Double.parseDouble(String.valueOf(r.nextInt(20))),
-					 0.0f,
-					-50f);
-		}
 	}
 
 	private void initStarShip() {
+			
 		starShip = new StarShip();
 		starShip.atribuirGLs(gl,glut);
+		starShip.drawStarShip();
+		
 	}
 	
-	private void initBullet(){
-		bullet = new Bullet();
+	private void initBullet() {
+		Bullet b = new Bullet();
+		b.atribuirGLs(gl, glut);
+		b.setId(gl.glGenLists(1));
+		bullets.add(b);
 	}
+
 
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println("    -- mouseClicked --  ");
+		// TODO Auto-generated method stub
 		
-		switch (e.getButton()) {
-			case MouseEvent.BUTTON1: // DESENHAR VERTEX
-				System.out.println("    -- CLICK MOUSE BUTTON LEFT --  ");
-				this.bullet = new Bullet();
-				this.bullet.drawBullet(
-						starShip.getMatrixObject().GetDate()[0],
-						starShip.getMatrixObject().GetDate()[5],
-						starShip.getMatrixObject().GetDate()[10]);
-				moveBullet();
-			break;
-		
-		}
 	}
-	
-	private void moveBullet() {
-		new Thread(new Runnable() {											
-			@Override
-			public void run() {
-				while(true){
-					try {
-						bullet.translacaoXYZ(0.0f, 0.0f, 1.0f);
-						glDrawable.display();
-						Thread.sleep(500);								
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}										
-				}
-			}
-		}).start();
-	}
+
 
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println("    -- mousePressed --  ");
+		
 	}
 
 
@@ -390,20 +419,14 @@ public class Main implements GLEventListener, KeyListener, MouseListener, MouseM
 	}
 
 
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	public float RetornaX(double angulo, double raio) {
+		return (float) (raio * Math.cos(Math.PI * angulo / 180.0));
 	}
-
-
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	
+	public float RetornaY(double angulo, double raio) {
+		return (float) (raio * Math.sin(Math.PI * angulo / 180.0));
 	}
-
+	
+	
 	
 }

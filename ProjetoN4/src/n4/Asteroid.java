@@ -1,11 +1,17 @@
 package n4;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLAutoDrawable;
 
 import com.sun.opengl.util.GLUT;
 
+/**
+ * @author kfus
+ *
+ */
 public class Asteroid {
 	 
+	private int id;
 	private boolean eHMaterial = true;
 	private GL gl;
 	private GLUT glut;
@@ -17,6 +23,10 @@ public class Asteroid {
 	private static Transformacao4D matrizTmpEscala = new Transformacao4D();
 	private static Transformacao4D matrizTmpRotacao = new Transformacao4D();
 	private static Transformacao4D matrizGlobal = new Transformacao4D();
+	
+	private static final float speed = 0.3f;
+	private float moveAsteroid;
+	
 	
 	
 	public Asteroid() {
@@ -58,7 +68,6 @@ public class Asteroid {
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
 			gl.glColor3f(0.0f, 1.0f, 0.0f); //VERDE
 			gl.glScalef(2.0f,2.0f,2.0f);
-			//gl.glTranslated(0.0f, 0.0f, 0.0f);
 			glut.glutSolidSphere(1.0f, 360, 360);	
 		gl.glPopMatrix();
 		
@@ -173,4 +182,23 @@ public class Asteroid {
 	public n4.BoundingBox getBbox() {
 		return this.bBox;
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public float getMoveAsteroid() {
+		return moveAsteroid += speed;
+	}
+
+	public void setMoveAsteroid(float moveAsteroid) {
+		this.moveAsteroid = moveAsteroid;
+	}
+
+	
+	
 }

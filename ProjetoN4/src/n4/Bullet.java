@@ -7,39 +7,34 @@ import com.sun.opengl.util.GLUT;
 public class Bullet {
 
 	private boolean eHMaterial = true;
+	private float corBlue[] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	public Transformacao4D matrixObject = new Transformacao4D();
 	private GL gl;
 	private GLUT glut;
-	private float corRed[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	private n4.BoundingBox bBox;
-	public Transformacao4D matrixObject = new Transformacao4D();
-	private static Transformacao4D matrizTmpTranslacao = new Transformacao4D();
-	private static Transformacao4D matrizTmpTranslacaoInversa = new Transformacao4D();
-	private static Transformacao4D matrizTmpEscala = new Transformacao4D();
-	private static Transformacao4D matrizTmpRotacao = new Transformacao4D();
-	private static Transformacao4D matrizGlobal = new Transformacao4D();
+	private int id;
+	private static final float speed = 1.0f;
+	private float moveBullet;
 	
 	public Bullet() {
 		super();
-		bBox = new n4.BoundingBox();
-		
 	}
+	
 	public void atribuirGLs(GL gl, GLUT glut) {
 		this.gl = gl;
 		this.glut = glut;
 	}
 	
-	public void drawBullet(double tx, double ty, double tz) {
+	public void drawBullet() {
 
 		if (eHMaterial) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corRed, 0);
+			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corBlue, 0);
 			gl.glEnable(GL.GL_LIGHTING);
 		}
 		gl.glPushMatrix();
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
-			gl.glColor3f(1.0f, 1.0f, 0.0f); 
+			gl.glColor3f(0.0f, 0.0f, 1.0f); 	//AZUL
 			gl.glScalef(2.0f, 2.0f, 2.0f);
-			gl.glTranslated(tx, ty, tz);
-			glut.glutSolidSphere(0.1f, 360, 360);
+			glut.glutSolidSphere(0.3f, 360, 360);
 
 		gl.glPopMatrix();
 
@@ -54,6 +49,32 @@ public class Bullet {
 		// ATRIBUI ALTERAÇÕES PARA A MATRIZ DESTE OBJETO
 		matrixObject = mL.transformMatrix(matrixObject);
 		
+	}
+	
+	public void setMatrix(Transformacao4D matrixL){
+		this.matrixObject = matrixL;
+	}
+	public void showMatrix() {
+		matrixObject.exibeMatriz();
+	}
+	public Transformacao4D getMatrixObject() {
+		return this.matrixObject;
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public float getMoveBullet() {
+		return moveBullet += speed;
+	}
+
+	public void setMoveBullet(float move) {
+		this.moveBullet = move;
 	}
 	
 	
