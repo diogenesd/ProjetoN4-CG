@@ -123,7 +123,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		gl.glViewport(0, 0, width, height);
 
 //		glu.gluOrtho2D(-30.0f, 30.0f, -30.0f, 30.0f);
-	    glu.gluPerspective(60, width/height, 0.1, 250);				// projecao Perpectiva 1 pto fuga 3D    
+	    glu.gluPerspective(60, width/height, 0.1, 800);				// projecao Perpectiva 1 pto fuga 3D    
 //		gl.glFrustum (-5.0, 5.0, -5.0, 5.0, 10, 100);			// projecao Perpectiva 1 pto fuga 3D
 //	    gl.glOrtho(-30.0f, 30.0f, -30.0f, 30.0f, -30.0f, 30.0f);	// projecao Ortogonal 3D
 
@@ -194,68 +194,75 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 			    }
 		
 			    
-		    // DESENHA FUNDO TEXTURA
+			 // DESENHA ESPAÇO TEXTURA
 				gl.glPushMatrix();
 					gl.glTranslatef(0.0f, 0.0f, 0.0f);
 					gl.glEnable(GL.GL_TEXTURE_2D); // Primeiro habilita uso de textura
 					gl.glBindTexture(GL.GL_TEXTURE_2D, idTexture[1]); 
 					gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, buffer[1]);
-						drawBackground();
+						drawSpace();
 					gl.glDisable(GL.GL_TEXTURE_2D); // Desabilita uso de textura
-					
-					gl.glPopMatrix();
-				
-			// DESENHA FUNDO BAIXO TEXTURA
-				gl.glPushMatrix();
-					gl.glTranslatef(0.0f, -100.0f, 0.0f);
-					gl.glEnable(GL.GL_TEXTURE_2D); // Primeiro habilita uso de textura
-					gl.glBindTexture(GL.GL_TEXTURE_2D, idTexture[1]); 
-					gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, buffer[1]);
-						drawBackgroundDown();
-					gl.glDisable(GL.GL_TEXTURE_2D); // Desabilita uso de textura
-				gl.glPopMatrix();
+				gl.glPopMatrix();    
 		    
 		gl.glPopMatrix();	
 		gl.glFlush();
 	}
-
-	private void drawBackgroundDown() {
-	gl.glPushMatrix();
-		gl.glTranslatef(0.0f, 0.0f, -75.0f);
-		gl.glScalef(130.0f, 0.0f, 100.0f);
-		gl.glColor3f(1.0f, 1.0f, 1.0f);
-		gl.glBegin (GL.GL_QUADS );
-			// Especifica a coordenada de textura para cada vertice
-			// Face frontal
-			gl.glNormal3f(0.0f,1.0f,0.0f);
-			gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);
-			gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);
-			gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);
-			gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);				
-		gl.glEnd();
-	gl.glPopMatrix();
-		
-	}
-
-	private void drawBackground() {
+	
+	public void drawSpace() {
 		gl.glPushMatrix();
-		gl.glTranslatef(0.0f, -0.0f, -100.0f);
-		gl.glScalef(130.0f, 80.0f, .0f);
+		gl.glTranslatef(0.0f, 0.0f, 0.0f);
+		gl.glScalef(200.0f, 200.0f, 200.0f);
 		gl.glColor3f(1.0f, 1.0f, 1.0f);
 		gl.glBegin (GL.GL_QUADS );
 			// Especifica a coordenada de textura para cada vertice
-			// Face frontal
-			gl.glNormal3f(0.0f,0.0f,-1.0f);
-			gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);
-			gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);
-			gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);
-			gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);				
-		gl.glEnd();
+			
+		// Face Posterior
+		gl.glNormal3f(0.0f,0.0f,-1.0f);
+		gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);
+		gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);
+		gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);
+		gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);	
 		
+		// Face Frontal
+		gl.glNormal3f(0.0f,0.0f,1.0f);
+		gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f, 1.0f);
+		gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f, 1.0f);
+		gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, 1.0f);
+		gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f, 1.0f);
+		
+		// Face Inferior
+		gl.glNormal3f(0.0f,1.0f,0.0f);
+		gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);
+		gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);
+		gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);
+		gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);
+		
+		// Face Superior
+		gl.glNormal3f(0.0f,-1.0f,0.0f);
+		gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-1.0f, 1.0f, -1.0f);
+		gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( 1.0f, 1.0f, -1.0f);
+		gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 1.0f, 1.0f,  1.0f);
+		gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.0f, 1.0f,  1.0f);
+		
+		// Face Esquerda
+		gl.glNormal3f(1.0f,0.0f,0.0f);
+		gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( -1.0f, -1.0f, -1.0f);
+		gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( -1.0f,  1.0f, -1.0f);
+		gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( -1.0f,  1.0f,  1.0f);
+		gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( -1.0f, -1.0f,  1.0f);
+					
+		// Face Direita
+		gl.glNormal3f(-1.0f,0.0f,0.0f);
+		gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);
+		gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);
+		gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);
+		gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);
+		
+		
+		gl.glEnd();
 	gl.glPopMatrix();
 		
 	}
-
 
 
 	public void loadImage(int ind, String fileName)
@@ -433,8 +440,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		// CAMERA CENTRAL
 		this.cameraPrincipal = new Camera();
 		this.cameraPrincipal.setxEye(0.0f);
-		this.cameraPrincipal.setyEye(30.0f);
-		this.cameraPrincipal.setzEye(50.0f);
+		this.cameraPrincipal.setyEye(10.0f);
+		this.cameraPrincipal.setzEye(100.0f);
 		this.cameraPrincipal.setxCenter(0.0f);
 		this.cameraPrincipal.setyCenter(0.0f);
 		this.cameraPrincipal.setzCenter(0.0f);
