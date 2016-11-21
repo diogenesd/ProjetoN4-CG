@@ -1,7 +1,6 @@
 package n4;
 import java.awt.BorderLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.Color;
 
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
@@ -25,6 +24,7 @@ public class Frame extends JFrame{
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
+		setBackground(Color.WHITE);
 		
 
 		/* Cria um objeto GLCapabilities para especificar 
@@ -35,7 +35,7 @@ public class Frame extends JFrame{
 		glCaps.setBlueBits(8);
 		glCaps.setGreenBits(8);
 		glCaps.setAlphaBits(8); 
-
+		
 		/* Cria um canvas, adiciona ao frame e objeto "ouvinte" 
 		 * para os eventos Gl, de mouse e teclado
 		 */
@@ -52,6 +52,7 @@ public class Frame extends JFrame{
 	
 	public static void main(String[] args) {
 		new Frame().setVisible(true);
+		
 		
 	}
 

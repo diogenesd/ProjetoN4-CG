@@ -8,17 +8,24 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 //import javax.media.opengl.glu.GLUquadric;
+import javax.swing.JOptionPane;
 
 import com.sun.opengl.util.GLUT;
+import com.sun.opengl.util.texture.TextureData;
 
 public class Main implements GLEventListener, KeyListener, MouseListener{
 	private GL gl;
@@ -34,6 +41,12 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	
 	private int starSp;
 	private Random random = new Random();
+	
+	private int idTexture[];
+	private int width, height;
+	private BufferedImage image;
+	private TextureData td;
+	private ByteBuffer buffer[];
     
     private boolean eHMaterial = true;
 
@@ -45,6 +58,17 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		glDrawable.setGL(new DebugGL(gl));
 
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		
+		//INICIA FUNDO
+		idTexture = new int[3]; // lista de identificadores de textura
+		gl.glGenTextures(1, idTexture, 2); 		// Gera identificador de textura
+		// Define os filtros de magnificacao e minificacao 
+		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);	
+		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
+		buffer = new ByteBuffer [3]; // buffer da imagem
+		loadImage(0,"space2.png"); // c
+		loadImage(1,"space.jpg"); // c
+		
 		
 		// INICIA AS CAMERAS
 		initCameras();
@@ -99,7 +123,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		gl.glViewport(0, 0, width, height);
 
 //		glu.gluOrtho2D(-30.0f, 30.0f, -30.0f, 30.0f);
-	    glu.gluPerspective(60, width/height, 0.1, 100);				// projecao Perpectiva 1 pto fuga 3D    
+	    glu.gluPerspective(60, width/height, 0.1, 250);				// projecao Perpectiva 1 pto fuga 3D    
 //		gl.glFrustum (-5.0, 5.0, -5.0, 5.0, 10, 100);			// projecao Perpectiva 1 pto fuga 3D
 //	    gl.glOrtho(-30.0f, 30.0f, -30.0f, 30.0f, -30.0f, 30.0f);	// projecao Ortogonal 3D
 
@@ -140,7 +164,6 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		drawAxis();
 		
 		//DESENHA STARSHIP
-		
 		 gl.glPushMatrix();
 			    gl.glPushMatrix();
 			    gl.glTranslated(
@@ -169,14 +192,92 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 						gl.glCallList(bullet.getId()); // Display List
 					gl.glPopMatrix();
 			    }
+		
 			    
-		 gl.glPopMatrix();
-		    
+		    // DESENHA FUNDO TEXTURA
+				gl.glPushMatrix();
+					gl.glTranslatef(0.0f, 0.0f, 0.0f);
+					gl.glEnable(GL.GL_TEXTURE_2D); // Primeiro habilita uso de textura
+					gl.glBindTexture(GL.GL_TEXTURE_2D, idTexture[1]); 
+					gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, buffer[1]);
+						drawBackground();
+					gl.glDisable(GL.GL_TEXTURE_2D); // Desabilita uso de textura
+					
+					gl.glPopMatrix();
 				
+			// DESENHA FUNDO BAIXO TEXTURA
+				gl.glPushMatrix();
+					gl.glTranslatef(0.0f, -100.0f, 0.0f);
+					gl.glEnable(GL.GL_TEXTURE_2D); // Primeiro habilita uso de textura
+					gl.glBindTexture(GL.GL_TEXTURE_2D, idTexture[1]); 
+					gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, buffer[1]);
+						drawBackgroundDown();
+					gl.glDisable(GL.GL_TEXTURE_2D); // Desabilita uso de textura
+				gl.glPopMatrix();
+		    
+		gl.glPopMatrix();	
 		gl.glFlush();
 	}
 
+	private void drawBackgroundDown() {
+	gl.glPushMatrix();
+		gl.glTranslatef(0.0f, 0.0f, -75.0f);
+		gl.glScalef(130.0f, 0.0f, 100.0f);
+		gl.glColor3f(1.0f, 1.0f, 1.0f);
+		gl.glBegin (GL.GL_QUADS );
+			// Especifica a coordenada de textura para cada vertice
+			// Face frontal
+			gl.glNormal3f(0.0f,1.0f,0.0f);
+			gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);
+			gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);
+			gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);
+			gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);				
+		gl.glEnd();
+	gl.glPopMatrix();
+		
+	}
 
+	private void drawBackground() {
+		gl.glPushMatrix();
+		gl.glTranslatef(0.0f, -0.0f, -100.0f);
+		gl.glScalef(130.0f, 80.0f, .0f);
+		gl.glColor3f(1.0f, 1.0f, 1.0f);
+		gl.glBegin (GL.GL_QUADS );
+			// Especifica a coordenada de textura para cada vertice
+			// Face frontal
+			gl.glNormal3f(0.0f,0.0f,-1.0f);
+			gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);
+			gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);
+			gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);
+			gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);				
+		gl.glEnd();
+		
+	gl.glPopMatrix();
+		
+	}
+
+
+
+	public void loadImage(int ind, String fileName)
+	{
+		// Tenta carregar o arquivo		
+		image = null;
+		try {
+			image = ImageIO.read(new File(fileName));
+		}
+		catch (IOException e) {
+			JOptionPane.showMessageDialog(null,"Erro na leitura do arquivo "+fileName);
+		}
+
+		// Obtem largura e altura
+		width  = image.getWidth();
+		height = image.getHeight();
+		// Gera uma nova TextureData...
+		td = new TextureData(0,0,false,image);
+		// ...e obtem um ByteBuffer a partir dela
+		buffer[ind] = (ByteBuffer) td.getBuffer();
+	}
+	
 	private void ligarLuz() {
 		if (eHMaterial) {
 			float posLight[] = { 5.0f, 5.0f, 10.0f, 0.0f };
@@ -223,28 +324,28 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		// TRANSLAÇÕES (L)
 		case KeyEvent.VK_RIGHT: // MOVER DIREITA
 			System.out.println("	-- VK_RIGHT --	");
-			if (starShip != null) {
+			if (starShip != null && starShip.getMatrixObject().GetElement(12) < 19) {
 					starShip.translacaoXYZ(1.0, 0.0, 0.0);
 				System.out.println("	-- (L)to: 1.0, 0.0, 0.0 --	");
 			}
 			break;
 		case KeyEvent.VK_LEFT: // MOVER ESQUERDA
 			System.out.println("	-- VK_LEFT --	");
-			if (starShip != null) {
+			if (starShip != null && starShip.getMatrixObject().GetElement(12) > -19) {
 				starShip.translacaoXYZ(-1.0, 0.0, 0.0);
 				System.out.println("	-- (L)to: -1.0, 0.0, 0.0 --	");
 			}
 			break;
 		case KeyEvent.VK_UP: // MOVER CIMA
 			System.out.println("	-- VK_UP --	");
-			if (starShip != null) {
+			if (starShip != null && starShip.getMatrixObject().GetElement(14) > -40) {
 				starShip.translacaoXYZ(0.0, 0.0, -1.0);
 				System.out.println("	-- (L)to: 0.0, 0.0, -1.0 --	");
 			}
 			break;
 		case KeyEvent.VK_DOWN: // MOVER BAIXO
 			System.out.println("	-- VK_DOWN --	");
-			if (starShip != null ) {
+			if (starShip != null && starShip.getMatrixObject().GetElement(14) < 32) {
 				starShip.translacaoXYZ(0.0, 0.0, 1.0);
 				System.out.println("	-- (L)to: 0.0, 0.0, 1.0--	");
 			}
@@ -253,10 +354,6 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		case KeyEvent.VK_ENTER: // MOVE ASTEROID ALEATORIOS
 			System.out.println("	-- VK_ENTER --	");
 			if (!asteroids.isEmpty()) {
-				for (Asteroid asteroid : asteroids) {
-					//Asteroid.moveAsteroid(glDrawable, asteroid, 10);
-				}
-				
 			}
 			break;
 			
@@ -327,6 +424,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		}else{
 			this.cameraPrincipal = cameraTemp;
 			camFocoPrincipal = !camFocoPrincipal;
+			System.out.println(cameraPrincipal.toString());
 		}
 	}
 	
@@ -335,8 +433,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		// CAMERA CENTRAL
 		this.cameraPrincipal = new Camera();
 		this.cameraPrincipal.setxEye(0.0f);
-		this.cameraPrincipal.setyEye(40.0f);
-		this.cameraPrincipal.setzEye(40.0f);
+		this.cameraPrincipal.setyEye(30.0f);
+		this.cameraPrincipal.setzEye(50.0f);
 		this.cameraPrincipal.setxCenter(0.0f);
 		this.cameraPrincipal.setyCenter(0.0f);
 		this.cameraPrincipal.setzCenter(0.0f);
@@ -344,8 +442,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		
 		// CAMERA LATERAL
 		this.cameraAux = new Camera();
-		this.cameraAux.setxEye(60.0f);
-		this.cameraAux.setyEye(60.0f);
+		this.cameraAux.setxEye(0.0f);
+		this.cameraAux.setyEye(0.0f);
 		this.cameraAux.setzEye(0.0f);
 		this.cameraAux.setxCenter(0.0f);
 		this.cameraAux.setyCenter(0.0f);
@@ -368,6 +466,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		starShip = new StarShip();
 		starShip.atribuirGLs(gl,glut);
 		starShip.drawStarShip();
+		starShip.translacaoXYZ(0.0f, 0.0f, 30.0f);
+		
 		
 	}
 	

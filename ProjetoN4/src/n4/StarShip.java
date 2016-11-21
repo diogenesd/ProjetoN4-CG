@@ -57,7 +57,7 @@ public class StarShip {
 		}
 		gl.glPushMatrix();
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
-			gl.glScalef(2.0f,2.0f,2.0f);
+			gl.glScalef(1.0f,1.0f,1.0f);
 			gl.glTranslated(0.0f, 0.0f, 0.0f);
 			glut.glutSolidCube(2.0f);
 		gl.glPopMatrix();
