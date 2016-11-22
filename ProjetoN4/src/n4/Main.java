@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.DebugGL;
@@ -49,6 +51,9 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	private ByteBuffer buffer[];
     
     private boolean eHMaterial = true;
+    private boolean showBbox = false;
+    
+    private final Set<Integer> pressed = new HashSet<>();
 
 	public void init(GLAutoDrawable drawable) {
 		glDrawable = drawable;
@@ -59,6 +64,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		
+		
 		//INICIA FUNDO
 		idTexture = new int[3]; // lista de identificadores de textura
 		gl.glGenTextures(1, idTexture, 2); 		// Gera identificador de textura
@@ -66,8 +72,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);	
 		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
 		buffer = new ByteBuffer [3]; // buffer da imagem
-		loadImage(0,"space2.png"); // c
-		loadImage(1,"space.jpg"); // c
+		loadImage(0,"estrelas2.png"); // c
+		//loadImage(1,"space.jpg"); // c
 		
 		
 		// INICIA AS CAMERAS
@@ -82,16 +88,16 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		
 		// INICIA ASTEROID
 	    asteroids = new ArrayList<>();
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 1; i++) {
 		    initAsteroids();
 		}
 		for (Asteroid asteroid : asteroids) {
 		    gl.glNewList(asteroid.getId(), GL.GL_COMPILE);
-		    	asteroid.translacaoXYZ(random.nextInt(20), 0.0f , -20.0f);
+		    	//asteroid.translacaoXYZ(random.nextInt(20), 0.0f , -20.0f);
+		    	//asteroid.translacaoXYZ(, 0.0f , 0.0f);
 		    	asteroid.drawAsteroid();
 		    gl.glEndList();
 		}
-	    
 		
 		// INICIA BALAS
 		bullets = new ArrayList<>();
@@ -163,46 +169,60 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
         // DESENHA ESPAÇO
 		drawAxis();
 		
+		// ATUALIZA OS EVENTOS 		
+		 updateEvents();
+		
 		//DESENHA STARSHIP
 		 gl.glPushMatrix();
 			    gl.glPushMatrix();
-			    gl.glTranslated(
+				    gl.glTranslated(
 			    		starShip.getMatrixObject().GetElement(12),
 			    		starShip.getMatrixObject().GetElement(13),
 			    		starShip.getMatrixObject().GetElement(14));
-			    gl.glCallList(starSp); // Display List
+				    gl.glCallList(starSp); // Display List
 			    gl.glPopMatrix();
-			
-			// DESENHA ASTEROIDS
-			    for (Asteroid asteroid : asteroids) {
-			    	gl.glPushMatrix();
-					    gl.glTranslated( 0.0f , 0.0f , asteroid.getMoveAsteroid());
-					    gl.glCallList(asteroid.getId()); // Display List
-				    gl.glPopMatrix();
-				}
-			    
-			// DESENHA BULLETS
-			    for (Bullet bullet : shots) {
-					gl.glPushMatrix();
-						gl.glTranslated(
-								bullet.getMatrixObject().GetElement(12),
-								bullet.getMatrixObject().GetElement(13),
-								bullet.getMatrixObject().GetElement(14) - bullet.getMoveBullet());
-						
-						gl.glCallList(bullet.getId()); // Display List
-					gl.glPopMatrix();
-			    }
+		if(showBbox){
+			starShip.drawBbox();
+		}
 		
+		// DESENHA ASTEROIDS
+		for (Asteroid asteroid : asteroids) {
+			gl.glPushMatrix();
+				gl.glTranslated(
+						asteroid.getMatrixObject().GetElement(12),
+						asteroid.getMatrixObject().GetElement(13),
+						asteroid.getMatrixObject().GetElement(14) + asteroid.getMoveAsteroid());
+				gl.glCallList(asteroid.getId()); // Display List
+			gl.glPopMatrix();
+			if (showBbox) {
+				asteroid.drawBbox();
+			}
+			
+		}
 			    
-			 // DESENHA ESPAÇO TEXTURA
+			    
+		// DESENHA BULLETS
+		    for (Bullet bullet : shots) {
 				gl.glPushMatrix();
-					gl.glTranslatef(0.0f, 0.0f, 0.0f);
-					gl.glEnable(GL.GL_TEXTURE_2D); // Primeiro habilita uso de textura
-					gl.glBindTexture(GL.GL_TEXTURE_2D, idTexture[1]); 
-					gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, buffer[1]);
-						drawSpace();
-					gl.glDisable(GL.GL_TEXTURE_2D); // Desabilita uso de textura
-				gl.glPopMatrix();    
+					gl.glTranslated(
+							bullet.getMatrixObject().GetElement(12),
+							bullet.getMatrixObject().GetElement(13),
+							bullet.getMatrixObject().GetElement(14) - bullet.getMoveBullet());
+					
+					gl.glCallList(bullet.getId()); // Display List
+				gl.glPopMatrix();
+		    }
+	
+		    
+		 // DESENHA ESPAÇO TEXTURA
+			gl.glPushMatrix();
+				gl.glTranslatef(0.0f, 0.0f, 0.0f);
+				gl.glEnable(GL.GL_TEXTURE_2D); // Primeiro habilita uso de textura
+				gl.glBindTexture(GL.GL_TEXTURE_2D, idTexture[0]); 
+				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, buffer[0]);
+					drawSpace();
+				gl.glDisable(GL.GL_TEXTURE_2D); // Desabilita uso de textura
+			gl.glPopMatrix();    
 		    
 		gl.glPopMatrix();	
 		gl.glFlush();
@@ -295,97 +315,118 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 			gl.glDisable(GL.GL_LIGHT0);
 	}
 
-	public void keyPressed(KeyEvent e) {
-		switch (e.getKeyCode()) {
+	public synchronized void keyPressed(KeyEvent e) {
 
-		case KeyEvent.VK_SPACE:
+		pressed.add(e.getKeyCode());
+
+		switch (e.getKeyCode()) {
+		
+		// CHANGE CAMERA
+		case KeyEvent.VK_C:
 			changeCam();
-			break;
+		break;
+		
+		// CHANGE COLOR MATERIAL
 		case KeyEvent.VK_M:
 			eHMaterial = !eHMaterial;
 			ligarLuz();
-			break;
+		break;
+		
+		// SHOW MATRIX STARTSHIP
+		case KeyEvent.VK_1:
+			starShip.showMatrix();
+		break;
+		
+		// SHOW BBOX
+		case KeyEvent.VK_B:
+			showBbox = !showBbox;
+			this.asteroids.get(0).showBbox();
+		break;
 		
 		// MOVE CAM UP
 		case KeyEvent.VK_W:
 			System.out.println("	-- VK_W --	");
 			this.cameraPrincipal.translacaoXYZ(0.0f, 0.0f, 1.0f);
-		break;
+			break;
 		// MOVE CAM UP
 		case KeyEvent.VK_S:
 			System.out.println("	-- VK_S --	");
 			this.cameraPrincipal.translacaoXYZ(0.0f, 0.0f, -1.0f);
-		break;
+			break;
 		// MOVE CAM RIGHT
 		case KeyEvent.VK_D:
 			System.out.println("	-- VK_D --	");
 			this.cameraPrincipal.translacaoXYZ(1.0f, 0.0f, 0.0f);
-		break;
+			break;
 		// MOVE CAM RIGHT
 		case KeyEvent.VK_A:
 			System.out.println("	-- VK_E --	");
 			this.cameraPrincipal.translacaoXYZ(-1.0f, 0.0f, 0.0f);
-		break;
-			
-			
+			break;
+		}
+
+		glDrawable.display();
+	}
+	
+	@Override
+    public synchronized void keyReleased(KeyEvent e) {
+        pressed.remove(e.getKeyCode());
+    }
+
+	public void updateEvents() {
+
+		
 		// TRANSLAÇÕES (L)
-		case KeyEvent.VK_RIGHT: // MOVER DIREITA
+		if (pressed.contains(KeyEvent.VK_RIGHT)) {
 			System.out.println("	-- VK_RIGHT --	");
 			if (starShip != null && starShip.getMatrixObject().GetElement(12) < 19) {
-					starShip.translacaoXYZ(1.0, 0.0, 0.0);
-				System.out.println("	-- (L)to: 1.0, 0.0, 0.0 --	");
+				
+				 ArrayList<Asteroid> objs = starShip.checkColisao(asteroids);
+				 if (objs.isEmpty()) {
+					 starShip.translacaoXYZ(1.0, 0.0, 0.0);
+					 System.out.println("	-- (L)to: 1.0, 0.0, 0.0 --	");
+				 }else{
+					 System.out.println("	-- ******************** Colisão ******************** --	");
+				 }
+				
 			}
-			break;
-		case KeyEvent.VK_LEFT: // MOVER ESQUERDA
+		}
+		if (pressed.contains(KeyEvent.VK_LEFT)) {
 			System.out.println("	-- VK_LEFT --	");
 			if (starShip != null && starShip.getMatrixObject().GetElement(12) > -19) {
 				starShip.translacaoXYZ(-1.0, 0.0, 0.0);
 				System.out.println("	-- (L)to: -1.0, 0.0, 0.0 --	");
 			}
-			break;
-		case KeyEvent.VK_UP: // MOVER CIMA
+		}
+		if (pressed.contains(KeyEvent.VK_UP)) {
 			System.out.println("	-- VK_UP --	");
 			if (starShip != null && starShip.getMatrixObject().GetElement(14) > -40) {
 				starShip.translacaoXYZ(0.0, 0.0, -1.0);
 				System.out.println("	-- (L)to: 0.0, 0.0, -1.0 --	");
 			}
-			break;
-		case KeyEvent.VK_DOWN: // MOVER BAIXO
+		}
+		if (pressed.contains(KeyEvent.VK_DOWN)) {
 			System.out.println("	-- VK_DOWN --	");
 			if (starShip != null && starShip.getMatrixObject().GetElement(14) < 32) {
 				starShip.translacaoXYZ(0.0, 0.0, 1.0);
 				System.out.println("	-- (L)to: 0.0, 0.0, 1.0--	");
 			}
-			break;
-			
-		case KeyEvent.VK_ENTER: // MOVE ASTEROID ALEATORIOS
-			System.out.println("	-- VK_ENTER --	");
-			if (!asteroids.isEmpty()) {
-			}
-			break;
-			
-		case KeyEvent.VK_F: // MOVE ASTEROID ALEATORIOS
+		}
+		
+		// BULLET
+		if (pressed.contains(KeyEvent.VK_F)) {
 			System.out.println("	-- VK_F --	");
-			
-			if(!bullets.isEmpty()){
-				
+			if (!bullets.isEmpty()) {
 				Bullet b = bullets.get(0);
 				bullets.remove(0);
 				b.setMatrix(starShip.getMatrixObject());
 				shots.add(b);
-				
-				
-				}
-			break;
-		
-		case KeyEvent.VK_1: // MOVE ASTEROID ALEATORIOS
-			starShip.showMatrix();				
-			break;
+			}
 		}
-	
-		glDrawable.display();	
-	}
 
+	}
+	
+	
 	public void drawAxis() {
 		// eixo X - Red
 		gl.glColor3f(1.0f, 0.0f, 0.0f);
@@ -410,11 +451,6 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	public void displayChanged(GLAutoDrawable arg0, boolean arg1, boolean arg2) {
 	}
 
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 
@@ -434,6 +470,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 			System.out.println(cameraPrincipal.toString());
 		}
 	}
+	
 	
 	private void initCameras(){
 		
@@ -464,6 +501,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 			Asteroid a = new Asteroid();
 			a.atribuirGLs(gl, glut);
 			a.setId(gl.glGenLists(1));
+			a.translacaoXYZ(5.0f, 0.0f, -30.0f);
 			asteroids.add(a);
 		
 	}

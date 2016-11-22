@@ -1,7 +1,6 @@
 package n4;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
 
 import com.sun.opengl.util.GLUT;
 
@@ -15,7 +14,7 @@ public class Asteroid {
 	private boolean eHMaterial = true;
 	private GL gl;
 	private GLUT glut;
-	private float corRed[] = { 245.0f, 205.0f, 0.0f, 1.0f };
+	private float corYellow[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 	private n4.BoundingBox bBox;
 	public Transformacao4D matrixObject = new Transformacao4D();
 	private static Transformacao4D matrizTmpTranslacao = new Transformacao4D();
@@ -41,15 +40,30 @@ public class Asteroid {
 	}
 	
 	public void drawBbox() {
-		gl.glColor3f(1.0f, 1.0f, 0.0f);	// COR AMARELA
-		gl.glLineWidth(3.0f);
+		gl.glColor3f(1.0f, 0.0f, 0.0f);	// COR VERMELHA
+		gl.glLineWidth(2.0f);
 		gl.glPushMatrix();
-		gl.glMultMatrixd(matrixObject.GetDate(), 0);
-		//DESENHA A BBOX
-		bBox.desenharOpenGLBBox(gl);
+			gl.glMultMatrixd(matrixObject.GetDate(), 0);
+			//DESENHA A BBOX
+			bBox.desenharOpenGLBBox(gl);
 		gl.glPopMatrix();
 		
 	}
+	
+	 public void atualizarBBox(float size) {
+	        n4.Ponto4D pontos[] = {new n4.Ponto4D(size * -1, size * -1, size * -1),
+	            new n4.Ponto4D(size, size, size),};
+
+	        // atualizar os pontos
+	        for (n4.Ponto4D ponto : pontos) {
+	            ponto.atribuirX(ponto.obterX() + matrixObject.GetElement(12));
+	            ponto.atribuirY(ponto.obterY() + matrixObject.GetElement(13));
+	            ponto.atribuirZ(ponto.obterZ() + matrixObject.GetElement(14));
+	        }
+
+	        // atualizar a Bbox
+	        bBox.setBoundingBox(pontos);
+	    }
 
 	public void showBbox() {
 		System.out.println(this.bBox.toString());
@@ -61,13 +75,13 @@ public class Asteroid {
 	public void drawAsteroid() {
 		
 		if (eHMaterial) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corRed, 0);
+			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corYellow, 0);
 			gl.glEnable(GL.GL_LIGHTING);
 		}
+		gl.glColor3f(1.0f, 1.0f, 0.0f); //YELLOW
 		gl.glPushMatrix();
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
-			gl.glColor3f(0.0f, 1.0f, 0.0f); //VERDE
-			gl.glScalef(2.0f,2.0f,2.0f);
+			gl.glScalef(1.0f,1.0f,1f);
 			glut.glutSolidSphere(1.0f, 360, 360);	
 		gl.glPopMatrix();
 		
@@ -75,6 +89,8 @@ public class Asteroid {
 			gl.glDisable(GL.GL_LIGHTING);
 		}
 		
+		 float size = 1;
+		 atualizarBBox(size);
 	}
 	
 	public void randomPosition(double tx, double ty, double tz){
@@ -173,6 +189,14 @@ public class Asteroid {
 	 */
 	public double obterMenorY() {
 		return bBox.obterMenorY();
+	}
+	
+	public double obterMaiorZ() {
+		return bBox.obterMaiorZ();
+	}
+	
+	public double obterMenorZ() {
+		return bBox.obterMenorZ();
 	}
 
 	/**

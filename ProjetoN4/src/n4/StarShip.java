@@ -1,5 +1,7 @@
 package n4;
 
+import java.util.ArrayList;
+
 import javax.media.opengl.GL;
 
 import com.sun.opengl.util.GLUT;
@@ -33,14 +35,29 @@ public class StarShip {
 	
 	public void drawBbox() {
 		gl.glColor3f(1.0f, 1.0f, 0f);	// COR AMARELA
-		gl.glLineWidth(3.0f);
+		gl.glLineWidth(2.0f);
 		gl.glPushMatrix();
-		gl.glMultMatrixd(matrixObject.GetDate(), 0);
-		//DESENHA A BBOX
-		bBox.desenharOpenGLBBox(gl);
+			gl.glMultMatrixd(matrixObject.GetDate(), 0);
+			//DESENHA A BBOX
+			bBox.desenharOpenGLBBox(gl);
 		gl.glPopMatrix();
 		
 	}
+	
+	 public void atualizarBBox(float size) {
+	        n4.Ponto4D pontos[] = {new n4.Ponto4D(size * -1, size * -1, size * -1),
+	            new n4.Ponto4D(size, size, size),};
+
+	        // atualizar os pontos
+	        for (n4.Ponto4D ponto : pontos) {
+	            ponto.atribuirX(ponto.obterX() + matrixObject.GetElement(12));
+	            ponto.atribuirY(ponto.obterY() + matrixObject.GetElement(13));
+	            ponto.atribuirZ(ponto.obterZ() + matrixObject.GetElement(14));
+	        }
+
+	        // atualizar a Bbox
+	        bBox.setBoundingBox(pontos);
+	    }
 
 	public void showBbox() {
 		System.out.println(this.bBox.toString());
@@ -58,13 +75,14 @@ public class StarShip {
 		gl.glPushMatrix();
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
 			gl.glScalef(1.0f,1.0f,1.0f);
-			gl.glTranslated(0.0f, 0.0f, 0.0f);
 			glut.glutSolidCube(2.0f);
 		gl.glPopMatrix();
 		
 		if (eHMaterial) {
 			gl.glDisable(GL.GL_LIGHTING);
 		}
+		float size = 1;
+		atualizarBBox(size);
 	}
 	
 	public void translacaoXYZ(double tx, double ty, double tz) {
@@ -122,6 +140,43 @@ public class StarShip {
 		matrixObject = matrixObject.transformMatrix(matrizGlobal);
 		
 	}
+	
+	public boolean colision(Asteroid asteroid) {
+
+        if ((obterMaiorX() > asteroid.obterMenorX() && obterMenorX() < asteroid.obterMenorX()
+                || (obterMaiorX() > asteroid.obterMaiorX() && obterMenorX() < asteroid.obterMaiorX())
+                || (obterMaiorX() <= asteroid.obterMaiorX() && obterMenorX() >= asteroid.obterMenorX())
+                || (obterMaiorX() == asteroid.obterMaiorX() && obterMenorX() == asteroid.obterMenorX()))){
+
+            if ((obterMaiorZ() > asteroid.obterMenorZ() && obterMenorZ() < asteroid.obterMenorZ())
+                    || (obterMaiorZ() > asteroid.obterMaiorZ() && obterMenorZ() < asteroid.obterMaiorZ())
+                    || (obterMaiorZ() <= asteroid.obterMaiorZ()&& obterMenorZ() >= asteroid.obterMenorZ())
+                    || (obterMaiorZ() == asteroid.obterMaiorZ() && obterMenorZ() == asteroid.obterMenorZ())) {
+
+                if ((obterMaiorY() > asteroid.obterMenorY() && obterMenorY() < asteroid.obterMenorY())
+                        || (obterMaiorY() > asteroid.obterMaiorY()&& obterMenorY() < asteroid.obterMaiorY())
+                        || (obterMaiorY() <= asteroid.obterMaiorY()&& obterMenorY() >= asteroid.obterMenorY())
+                        || (obterMaiorY() == asteroid.obterMaiorY() && obterMenorY() == asteroid.obterMenorY())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+	
+	public ArrayList<Asteroid> checkColisao(ArrayList<Asteroid> objetos) {
+        ArrayList<Asteroid> colisionObj = new ArrayList<>();
+        if (objetos != null) {
+            for (Asteroid obj : objetos) {
+                if (colision(obj)) {
+                    colisionObj.add(obj);
+                }
+
+            }
+        }
+        return colisionObj;
+    }
+	
 	public void showMatrix() {
 		matrixObject.exibeMatriz();
 	}
@@ -159,6 +214,14 @@ public class StarShip {
 	 */
 	public double obterMenorY() {
 		return bBox.obterMenorY();
+	}
+	
+	public double obterMaiorZ() {
+		return bBox.obterMaiorZ();
+	}
+	
+	public double obterMenorZ() {
+		return bBox.obterMenorZ();
 	}
 
 	/**

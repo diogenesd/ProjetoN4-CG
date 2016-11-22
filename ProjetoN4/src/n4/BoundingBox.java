@@ -23,6 +23,7 @@ public final class BoundingBox {
 		this.maiorX = greaterX;
 		this.maiorY = greaterY;
 		this.maiorZ = greaterZ;
+		processarCentroBBox();
 	}
 	
 	public void atribuirBoundingBox(double smallerX, double smallerY, double smallerZ, double greaterX, double greaterY, double greaterZ) {
@@ -35,27 +36,36 @@ public final class BoundingBox {
 		processarCentroBBox();
 	}
 		
-	public void atualizarBBox(Ponto4D point) {
-	    atualizarBBox(point.obterX(), point.obterY(), point.obterZ());
-	}
+	 public void setBoundingBox(Ponto4D[] pontos) {
+		 atribuirBoundingBox(pontos[0].obterX(), pontos[0].obterY(), pontos[0].obterZ(),
+	                pontos[0].obterX(), pontos[0].obterY(), pontos[0].obterZ());
+	        atualizarBBox(pontos);
+	        processarCentroBBox();
+	    }
+	
+	 public void atualizarBBox(Ponto4D[] pontos) {
+	        for (Ponto4D ponto : pontos) {
+	            atualizarBBox(ponto.obterX(), ponto.obterY(), ponto.obterZ());
+	        }
+	    }
 
 	public void atualizarBBox(double x, double y, double z) {
-	    if (x < menorX)
-	        menorX = x;
-	    else {
-	        if (x > maiorX) maiorX = x;
+	        if (x < menorX) {
+	            menorX = x;
+	        } else if (x > maiorX) {
+	            maiorX = x;
+	        }
+	        if (y < menorY) {
+	            menorY = y;
+	        } else if (y > maiorY) {
+	            maiorY = y;
+	        }
+	        if (z < menorZ) {
+	            menorZ = z;
+	        } else if (z > maiorZ) {
+	            maiorZ = z;
+	        }
 	    }
-	    if (y < menorY)
-	        menorY = y;
-	    else {
-	        if (y > maiorY) maiorY = y;
-	    }
-	    if (z < menorZ)
-	        menorZ = z;
-	    else {
-	        if (z > maiorZ) maiorZ = z;
-	    }
-	}
 	
 	public void processarCentroBBox() {
 	    centro.atribuirX((maiorX + menorX)/2);
@@ -90,6 +100,8 @@ public final class BoundingBox {
 	    	gl.glVertex3d (maiorX , menorY , maiorZ);
     	gl.glEnd();
 	}
+	
+	
 
 	/// Obter menor valor X da BBox.
 	public double obterMenorX() {

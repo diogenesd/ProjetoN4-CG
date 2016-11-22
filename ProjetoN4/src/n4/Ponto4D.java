@@ -29,6 +29,13 @@ public final class Ponto4D {
 		this.w = w;
 	}
 	
+	public Ponto4D(float f, float g, float h) {
+		this.x = f;
+		this.y = g;
+		this.z = h;
+		this.w = 1;
+	}
+
 	public Ponto4D inverterSinal(Ponto4D pto) {
 		pto.atribuirX(pto.obterX()*-1);
 		pto.atribuirY(pto.obterY()*-1);
