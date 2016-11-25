@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -64,42 +63,13 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		
-		
-		//INICIA FUNDO
-		idTexture = new int[3]; // lista de identificadores de textura
-		gl.glGenTextures(1, idTexture, 2); 		// Gera identificador de textura
-		// Define os filtros de magnificacao e minificacao 
-		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MIN_FILTER,GL.GL_LINEAR);	
-		gl.glTexParameteri(GL.GL_TEXTURE_2D,GL.GL_TEXTURE_MAG_FILTER,GL.GL_LINEAR);
-		buffer = new ByteBuffer [3]; // buffer da imagem
-		loadImage(0,"estrelas2.png"); // c
-		//loadImage(1,"space.jpg"); // c
-		
-		
 		mundo = new World(gl, glu, glut, drawable);
 		
 		// INICIA AS CAMERAS
 		initCameras();
 		
-		// INICIA NAVE
-	    starSp = gl.glGenLists(1);
-	    gl.glNewList(starSp, GL.GL_COMPILE);
-		    initStarShip();
-	    gl.glEndList();
 		
-		
-		// INICIA ASTEROID
-	    asteroids = new ArrayList<>();
-		for (int i = 0; i < 1; i++) {
-		    initAsteroids();
-		}
-		for (Asteroid asteroid : asteroids) {
-		    gl.glNewList(asteroid.getId(), GL.GL_COMPILE);
-		    	asteroid.drawAsteroid();
-		    gl.glEndList();
-		}
-		
-		// INICIA BALAS
+		/*// INICIA BALAS
 		bullets = new ArrayList<>();
 		shots = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
@@ -109,7 +79,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	    	gl.glNewList(bullet.getId(), GL.GL_COMPILE);
 	    		bullet.drawBullet();
 	    	gl.glEndList();
-	    }
+	    }*/
 		
 		// ILUMINACAO
 		ligarLuz();
@@ -120,7 +90,6 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	    gl.glEnable(GL.GL_DEPTH_TEST);  // 
 //	    gl.glDisable(GL.GL_DEPTH_TEST);	// DEFAULT OFF DEVIDO AO CUSTO
 	    
-	    posiciona();
 	}
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -187,7 +156,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 					}*/
 						    
 						    
-					// DESENHA BULLETS
+					/*// DESENHA BULLETS
 					    for (Bullet bullet : shots) {
 							gl.glPushMatrix();
 								gl.glTranslated(
@@ -197,7 +166,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 								
 								gl.glCallList(bullet.getId()); // Display List
 							gl.glPopMatrix();
-					    }
+					    }*/
 					    
 		    
 		gl.glPopMatrix();	
@@ -445,11 +414,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		// BULLET
 		if (pressed.contains(KeyEvent.VK_F)) {
 			System.out.println("	-- VK_F --	");
-			if (!bullets.isEmpty()) {
-				Bullet b = bullets.get(0);
-				bullets.remove(0);
-				b.setMatrix(starShip.getMatrixObject());
-				shots.add(b);
+			if (mundo != null && mundo.getStarShip() != null) {
+				mundo.addBUllets(mundo.getStarShip());
 			}
 		}
 
@@ -546,10 +512,10 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	}
 	
 	private void initBullet() {
-		Bullet b = new Bullet();
+		/*Bullet b = new Bullet();
 		b.atribuirGLs(gl, glut);
 		b.setId(gl.glGenLists(1));
-		bullets.add(b);
+		bullets.add(b);*/
 	}
 	
 	private void posiciona(){

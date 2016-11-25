@@ -12,20 +12,21 @@ public class StarShip extends ObjetoGrafico{
 	private GL gl;
 	private GLUT glut;
 	private float corRed[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	private float[] corGray = { 0.5f, 0.5f, 0.5f, 1.0f };
-	private float[] corYellow = { 1.0f, 1.0f, 0.0f, 1.0f};
-	private n4.BoundingBox bBox;
+	private BoundingBox bBox;
 	public Transformacao4D matrixObject = new Transformacao4D();
 	private double speed = 0.3f;
 	private float size = 1.0f;
 	private boolean ativo = true;
-	
+	private ArrayList<Bullet> bullets;
 	
 	public StarShip(GL gl, GLUT glut) {
 		super();
-		bBox = new n4.BoundingBox();
+		bBox = new BoundingBox();
 		this.gl = gl;
 		this.glut = glut;
+		
+		bullets = new ArrayList<Bullet>();
+		
 	}
 	
 	public void drawBbox() {
@@ -83,7 +84,7 @@ public class StarShip extends ObjetoGrafico{
 			if (eHMaterial) {
 				gl.glDisable(GL.GL_LIGHTING);
 			}
-			float size = 1;
+			//float size = 1;
 			atualizarBBox(size);
 		}else{
 			fire();
@@ -104,6 +105,41 @@ public class StarShip extends ObjetoGrafico{
 			gl.glDisable(GL.GL_LIGHTING);
 		}
     }
+    
+    
+	public Bullet shootBullet(ArrayList<Asteroid> objetos) {
+		
+		Bullet bullet = new Bullet(gl, glut);
+		
+		bullet.translacaoXYZ(this.matrixObject.GetElement(12),
+				this.matrixObject.GetElement(13),
+				this.matrixObject.GetElement(14));
+
+		bullet.atualizarBBox();
+
+		ArrayList<Asteroid> objetosColidem = bullet.checkColisao(objetos);
+		
+		if (objetosColidem.isEmpty()) {
+			bullets.add(bullet);
+			return bullet;
+		}else{
+			for (Asteroid asteroid : objetosColidem) {
+				System.out.println(" -- Colisão --");
+				asteroid.showBbox();
+			}
+		}
+
+		return null;
+	}
+    
+	public void removeBullet(Bullet bullet) {
+		bullets.remove(bullet);
+	}
+
+	public ArrayList<Bullet> getBullets() {
+		return bullets;
+	}
+    
 	public void translacaoXYZ(double tx, double ty, double tz) {
 		Transformacao4D mL = new Transformacao4D();
 		mL.atribuirTranslacao(tx, ty, tz);
@@ -130,16 +166,12 @@ public class StarShip extends ObjetoGrafico{
 		mL.atribuirTranslacao(0.0f, 0.0f, speed);
 		matrixObject = mL.transformMatrix(matrixObject);
 	}
-	
-	
 	public void escalaXYZ(double Sx, double Sy) {
 		Transformacao4D matrizScale = new Transformacao4D();
 		matrizScale.atribuirEscala(Sx, Sy, 1.0);
 		// ATRIBUI ALTERAÇÕES PARA A MATRIZ DESTE OBJETO
 		matrixObject = matrizScale.transformMatrix(matrixObject);
-		
 	}
-	
 	public boolean colision(Asteroid asteroid) {
 
         if ((obterMaiorX() > asteroid.obterMenorX() && obterMenorX() < asteroid.obterMenorX()
@@ -177,6 +209,10 @@ public class StarShip extends ObjetoGrafico{
         return colisionObj;
     }
 	
+	public void setBullets(ArrayList<Bullet> bullets) {
+		this.bullets = bullets;
+	}
+
 	public void showMatrix() {
 		matrixObject.exibeMatriz();
 	}

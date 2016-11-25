@@ -46,7 +46,6 @@ public class World {
 			objetos.add(a);
 			asteroids.add(a);
 		}	
-		
 		posiciona();
 		
 	}
@@ -66,6 +65,13 @@ public class World {
 			limite *= -1;
 		}
 	}
+	
+	public void addBUllets(StarShip starShip) {
+        Bullet bullet = starShip.shootBullet(asteroids);
+        if (bullet != null) {
+            objetos.add(bullet);
+        }
+    }
 	
 	public ArrayList<ObjetoGrafico> getObjetos() {
 		return objetos;
