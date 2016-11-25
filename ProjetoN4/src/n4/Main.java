@@ -42,7 +42,6 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	private ArrayList<Bullet> shots;
 	
 	private int starSp;
-	private Random random = new Random();
 	
 	private int idTexture[];
 	private int width, height;
@@ -54,6 +53,7 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
     private boolean showBbox = false;
     
     private final Set<Integer> pressed = new HashSet<>();
+	private World mundo;
 
 	public void init(GLAutoDrawable drawable) {
 		glDrawable = drawable;
@@ -76,6 +76,8 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		//loadImage(1,"space.jpg"); // c
 		
 		
+		mundo = new World(gl, glu, glut, drawable);
+		
 		// INICIA AS CAMERAS
 		initCameras();
 		
@@ -93,8 +95,6 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		}
 		for (Asteroid asteroid : asteroids) {
 		    gl.glNewList(asteroid.getId(), GL.GL_COMPILE);
-		    	//asteroid.translacaoXYZ(random.nextInt(20), 0.0f , -20.0f);
-		    	//asteroid.translacaoXYZ(, 0.0f , 0.0f);
 		    	asteroid.drawAsteroid();
 		    gl.glEndList();
 		}
@@ -119,21 +119,15 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		
 	    gl.glEnable(GL.GL_DEPTH_TEST);  // 
 //	    gl.glDisable(GL.GL_DEPTH_TEST);	// DEFAULT OFF DEVIDO AO CUSTO
+	    
+	    posiciona();
 	}
-
-
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 	    gl.glMatrixMode(GL.GL_PROJECTION);
 	    gl.glLoadIdentity();
 		gl.glViewport(0, 0, width, height);
-
-//		glu.gluOrtho2D(-30.0f, 30.0f, -30.0f, 30.0f);
 	    glu.gluPerspective(60, width/height, 0.1, 800);				// projecao Perpectiva 1 pto fuga 3D    
-//		gl.glFrustum (-5.0, 5.0, -5.0, 5.0, 10, 100);			// projecao Perpectiva 1 pto fuga 3D
-//	    gl.glOrtho(-30.0f, 30.0f, -30.0f, 30.0f, -30.0f, 30.0f);	// projecao Ortogonal 3D
-
-//		Debug();
 	}
 
 	public void display(GLAutoDrawable drawable) {
@@ -169,60 +163,42 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
         // DESENHA ESPAÇO
 		drawAxis();
 		
+		// DESENHA MUNDO
+		mundo.desenha();
+		
 		// ATUALIZA OS EVENTOS 		
-		 updateEvents();
+		updateEvents();
 		
-		//DESENHA STARSHIP
-		 gl.glPushMatrix();
-			    gl.glPushMatrix();
-				    gl.glTranslated(
-			    		starShip.getMatrixObject().GetElement(12),
-			    		starShip.getMatrixObject().GetElement(13),
-			    		starShip.getMatrixObject().GetElement(14));
-				    gl.glCallList(starSp); // Display List
-			    gl.glPopMatrix();
-		if(showBbox){
-			starShip.drawBbox();
-		}
+		gl.glPushMatrix();
 		
-		// DESENHA ASTEROIDS
-		for (Asteroid asteroid : asteroids) {
-			gl.glPushMatrix();
-				gl.glTranslated(
-						asteroid.getMatrixObject().GetElement(12),
-						asteroid.getMatrixObject().GetElement(13),
-						asteroid.getMatrixObject().GetElement(14) + asteroid.getMoveAsteroid());
-				gl.glCallList(asteroid.getId()); // Display List
-			gl.glPopMatrix();
-			if (showBbox) {
-				asteroid.drawBbox();
-			}
-			
-		}
-			    
-			    
-		// DESENHA BULLETS
-		    for (Bullet bullet : shots) {
-				gl.glPushMatrix();
-					gl.glTranslated(
-							bullet.getMatrixObject().GetElement(12),
-							bullet.getMatrixObject().GetElement(13),
-							bullet.getMatrixObject().GetElement(14) - bullet.getMoveBullet());
-					
-					gl.glCallList(bullet.getId()); // Display List
-				gl.glPopMatrix();
-		    }
-	
-		    
-		 // DESENHA ESPAÇO TEXTURA
-			gl.glPushMatrix();
-				gl.glTranslatef(0.0f, 0.0f, 0.0f);
-				gl.glEnable(GL.GL_TEXTURE_2D); // Primeiro habilita uso de textura
-				gl.glBindTexture(GL.GL_TEXTURE_2D, idTexture[0]); 
-				gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, 3, width, height, 0, GL.GL_BGR, GL.GL_UNSIGNED_BYTE, buffer[0]);
-					drawSpace();
-				gl.glDisable(GL.GL_TEXTURE_2D); // Desabilita uso de textura
-			gl.glPopMatrix();    
+					// DESENHA ASTEROIDS
+					/*for (Asteroid asteroid : asteroids) {
+						gl.glPushMatrix();
+							gl.glTranslated(
+									asteroid.getMatrixObject().GetElement(12),
+									asteroid.getMatrixObject().GetElement(13),
+									asteroid.getMatrixObject().GetElement(14)); //+ asteroid.getMoveAsteroid());
+									asteroid.atualizarBBox();
+							gl.glCallList(asteroid.getId()); // Display List
+						gl.glPopMatrix();
+						if (showBbox) {
+							asteroid.drawBbox();
+						}
+					}*/
+						    
+						    
+					// DESENHA BULLETS
+					    for (Bullet bullet : shots) {
+							gl.glPushMatrix();
+								gl.glTranslated(
+										bullet.getMatrixObject().GetElement(12),
+										bullet.getMatrixObject().GetElement(13),
+										bullet.getMatrixObject().GetElement(14) - bullet.getMoveBullet());
+								
+								gl.glCallList(bullet.getId()); // Display List
+							gl.glPopMatrix();
+					    }
+					    
 		    
 		gl.glPopMatrix();	
 		gl.glFlush();
@@ -284,7 +260,6 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		
 	}
 
-
 	public void loadImage(int ind, String fileName)
 	{
 		// Tenta carregar o arquivo		
@@ -340,7 +315,10 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		// SHOW BBOX
 		case KeyEvent.VK_B:
 			showBbox = !showBbox;
-			this.asteroids.get(0).showBbox();
+			System.out.println("ASTEROID");
+			mundo.getAsteroids().get(0).showBbox();
+			System.out.println("STARSHIP");
+			mundo.getStarShip().showBbox();
 		break;
 		
 		// MOVE CAM UP
@@ -374,42 +352,93 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
     }
 
 	public void updateEvents() {
-
 		
 		// TRANSLAÇÕES (L)
 		if (pressed.contains(KeyEvent.VK_RIGHT)) {
 			System.out.println("	-- VK_RIGHT --	");
-			if (starShip != null && starShip.getMatrixObject().GetElement(12) < 19) {
-				
-				 ArrayList<Asteroid> objs = starShip.checkColisao(asteroids);
-				 if (objs.isEmpty()) {
-					 starShip.translacaoXYZ(1.0, 0.0, 0.0);
+			if (mundo.getStarShip() != null && mundo.getStarShip().getMatrixObject().GetElement(12) < 19) {
+
+				mundo.getStarShip().moveRigth();
+				ArrayList<Asteroid> objs = mundo.getStarShip().checkColisao(mundo.getAsteroids());
+				if (objs.isEmpty()) {
 					 System.out.println("	-- (L)to: 1.0, 0.0, 0.0 --	");
 				 }else{
 					 System.out.println("	-- ******************** Colisão ******************** --	");
+					 mundo.getStarShip().setAtivo(false);
 				 }
 				
 			}
 		}
 		if (pressed.contains(KeyEvent.VK_LEFT)) {
 			System.out.println("	-- VK_LEFT --	");
-			if (starShip != null && starShip.getMatrixObject().GetElement(12) > -19) {
-				starShip.translacaoXYZ(-1.0, 0.0, 0.0);
-				System.out.println("	-- (L)to: -1.0, 0.0, 0.0 --	");
+			if (mundo.getStarShip() != null && mundo.getStarShip().getMatrixObject().GetElement(12) > -19) {
+				
+				mundo.getStarShip().moveLeft();
+				 ArrayList<Asteroid> objs = mundo.getStarShip().checkColisao(mundo.getAsteroids());
+				 if (objs.isEmpty()) {
+					 System.out.println("	-- (L)to: -1.0, 0.0, 0.0 --	");
+				 }else{
+					 System.out.println("	-- ******************** Colisão ******************** --	");
+					 mundo.getStarShip().setAtivo(false);
+				 }
 			}
 		}
 		if (pressed.contains(KeyEvent.VK_UP)) {
 			System.out.println("	-- VK_UP --	");
-			if (starShip != null && starShip.getMatrixObject().GetElement(14) > -40) {
-				starShip.translacaoXYZ(0.0, 0.0, -1.0);
-				System.out.println("	-- (L)to: 0.0, 0.0, -1.0 --	");
+			if (mundo.getStarShip() != null && mundo.getStarShip().getMatrixObject().GetElement(14) > -40) {
+				
+				mundo.getStarShip().moveUp();
+				 ArrayList<Asteroid> objs = mundo.getStarShip().checkColisao(mundo.getAsteroids());
+				 if (objs.isEmpty()) {
+					 System.out.println("	-- (L)to: 0.0, 0.0, -1.0 --	");
+				 }else{
+					 System.out.println("	-- ******************** Colisão ******************** --	");
+					 mundo.getStarShip().setAtivo(false);
+				 }
 			}
 		}
 		if (pressed.contains(KeyEvent.VK_DOWN)) {
 			System.out.println("	-- VK_DOWN --	");
-			if (starShip != null && starShip.getMatrixObject().GetElement(14) < 32) {
-				starShip.translacaoXYZ(0.0, 0.0, 1.0);
+			if (mundo.getStarShip() != null && mundo.getStarShip().getMatrixObject().GetElement(14) < 32) {
+				
+				mundo.getStarShip().moveDown();
+				 ArrayList<Asteroid> objs = mundo.getStarShip().checkColisao(mundo.getAsteroids());
+				 if (objs.isEmpty()) {
+					 System.out.println("	-- (L)to: 0.0, 0.0, 1.0 --	");
+				 }else{
+					 System.out.println("	-- ******************** Colisão ******************** --	");
+					 mundo.getStarShip().setAtivo(false);
+				 }
+			}
+		}
+		
+		//ASTEROID
+		if (pressed.contains(KeyEvent.VK_NUMPAD2)) {
+			System.out.println("	-- VK_NUMPAD2 --	");
+			if (!mundo.getAsteroids().isEmpty() ) {
+				mundo.getAsteroids().get(0).moveDown();
 				System.out.println("	-- (L)to: 0.0, 0.0, 1.0--	");
+			}
+		}
+		if (pressed.contains(KeyEvent.VK_NUMPAD8)) {
+			System.out.println("	-- VK_NUMPAD8 --	");
+			if (!mundo.getAsteroids().isEmpty() ) {
+				mundo.getAsteroids().get(0).moveUp();
+				System.out.println("	-- (L)to: 0.0, 0.0, -1.0--	");
+			}
+		}
+		if (pressed.contains(KeyEvent.VK_NUMPAD6)) {
+			System.out.println("	-- VK_NUMPAD6 --	");
+			if (!mundo.getAsteroids().isEmpty()) {
+				mundo.getAsteroids().get(0).moveRigth();
+				System.out.println("	-- (L)to: 1.0, 0.0, 0.0--	");
+			}
+		}
+		if (pressed.contains(KeyEvent.VK_NUMPAD4)) {
+			System.out.println("	-- VK_NUMPAD4 --	");
+			if (!mundo.getAsteroids().isEmpty() ) {
+				mundo.getAsteroids().get(0).moveLeft();
+				System.out.println("	-- (L)to: -1.0, 0.0, 0.0--	");
 			}
 		}
 		
@@ -498,21 +527,21 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 	}
 	
 	private void initAsteroids() {
+		
+		/*for (int i = 0; i < 2 ; i++) {
 			Asteroid a = new Asteroid();
 			a.atribuirGLs(gl, glut);
 			a.setId(gl.glGenLists(1));
-			a.translacaoXYZ(5.0f, 0.0f, -30.0f);
 			asteroids.add(a);
-		
+		}*/
+			
 	}
 
 	private void initStarShip() {
 			
-		starShip = new StarShip();
+		/*starShip = new StarShip();
 		starShip.atribuirGLs(gl,glut);
-		starShip.drawStarShip();
-		starShip.translacaoXYZ(0.0f, 0.0f, 30.0f);
-		
+		starShip.drawStarShip();*/
 		
 	}
 	
@@ -521,6 +550,16 @@ public class Main implements GLEventListener, KeyListener, MouseListener{
 		b.atribuirGLs(gl, glut);
 		b.setId(gl.glGenLists(1));
 		bullets.add(b);
+	}
+	
+	private void posiciona(){
+		//starShip.translacaoXYZ(0.0f, 0.0f, 30.f);
+		
+		/*int limite = 10;
+		for (ObjetoGrafico asteroid : mundo.getAsteroids()) {
+			asteroid.translacaoXYZ(limite, 0.0f, 30.f);
+			limite *= -1;
+		}*/
 	}
 
 
