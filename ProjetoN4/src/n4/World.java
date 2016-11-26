@@ -2,7 +2,10 @@ package n4;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -24,6 +27,8 @@ public class World {
 	private Espaco espaco;
 	private StarShip starShip;
 	
+	private int tempo;
+	private Timer timer;
 	
 	public World(GL gl, GLU glu, GLUT glut, GLAutoDrawable drawable) {
 		glDrawable = drawable;
@@ -44,16 +49,15 @@ public class World {
 		starShip = new StarShip(gl, glut);
 		objetos.add(starShip);
 		
-		for (int i = 0; i < 2 ; i++) {
-			Asteroid a = new Asteroid(gl, glut);
-			objetos.add(a);
-			asteroids.add(a);
-		}	
-		posiciona();
+		contador(gl, glut);
 		
 	}
 	
 	public void desenha() {
+		
+		if(!asteroids.isEmpty()){
+			objetos.addAll(asteroids);
+		}
 		
 		if (!objetosInativos.isEmpty()) {
 			for (ObjetoGrafico objeto : objetosInativos) {
@@ -88,14 +92,6 @@ public class World {
 			} else {
 				objetosInativos.add(objeto);
 			}
-		}
-	}
-	
-	private void posiciona(){
-		int limite = 10;
-		for (ObjetoGrafico asteroid : asteroids) {
-			asteroid.translacaoXYZ(limite, 0.0f, -60.f);
-			limite *= -1;
 		}
 	}
 	
@@ -137,5 +133,21 @@ public class World {
 	public void setStarShip(StarShip starShip) {
 		this.starShip = starShip;
 	}
+	
+	public final void contador(GL gl, GLUT glut) {
+        timer = new Timer();
+        Random r = new Random();
+        
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+            	int pos = -30;
+            	Asteroid a = new Asteroid(gl, glut);
+    			asteroids.add(a);
+    			a.translacaoXYZ(pos += r.nextInt(60), 0.0f, -60.f);
+    			
+            }
+        }, 1000, 5000);
+    }
 	
 }

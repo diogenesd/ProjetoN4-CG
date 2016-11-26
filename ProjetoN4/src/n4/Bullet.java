@@ -23,7 +23,7 @@ public class Bullet extends ObjetoGrafico{
 	private boolean ativo;
 	private boolean explodiu = false;
 	private int tempo;
-	 private Timer timer;
+	private Timer timer;
 	
 	public Bullet(GL gl, GLUT glut) {
 		super();
