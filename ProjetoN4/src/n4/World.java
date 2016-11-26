@@ -89,7 +89,7 @@ public class World {
 	private void posiciona(){
 		int limite = 10;
 		for (ObjetoGrafico asteroid : asteroids) {
-			asteroid.translacaoXYZ(limite, 0.0f, 30.f);
+			asteroid.translacaoXYZ(limite, 0.0f, -60.f);
 			limite *= -1;
 		}
 	}

@@ -19,9 +19,9 @@ public class Asteroid extends ObjetoGrafico{
 	public Transformacao4D matrixObject = new Transformacao4D();
 	
 	private boolean ativo = true;
-	private static final float speed = 0.3f;
+	private static final float speed = 0.05f;
 	private float moveAsteroid;
-	private float size = 1.0f;
+	private float size = 1.5f;
 	
 	
 	
@@ -71,25 +71,27 @@ public class Asteroid extends ObjetoGrafico{
 	
 	
 	public void drawAsteroid() {
-		
-		if (eHMaterial) {
-			gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corYellow, 0);
-			gl.glEnable(GL.GL_LIGHTING);
+	
+		if (ativo) {
+			if (eHMaterial) {
+				gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, corYellow, 0);
+				gl.glEnable(GL.GL_LIGHTING);
+			}
+			gl.glColor3f(1.0f, 1.0f, 0.0f); //YELLOW
+			gl.glPushMatrix();
+				gl.glMultMatrixd(matrixObject.GetDate(), 0);
+				gl.glTranslated(0.0f, 0.0f, 0.0f);
+				gl.glScalef( size , size, size);
+				glut.glutSolidCube(size);//glut.glutSolidSphere(1.0f, 360, 360);	
+			gl.glPopMatrix();
+			
+			if (eHMaterial) {
+				gl.glDisable(GL.GL_LIGHTING);
+			}
+			
+			atualizarBBox(size);
+			moveDown();
 		}
-		gl.glColor3f(1.0f, 1.0f, 0.0f); //YELLOW
-		gl.glPushMatrix();
-			gl.glMultMatrixd(matrixObject.GetDate(), 0);
-			gl.glTranslated(0.0f, 0.0f, 0.0f);
-			gl.glScalef( size , size, size);
-			glut.glutSolidCube(2.0f);//glut.glutSolidSphere(1.0f, 360, 360);	
-		gl.glPopMatrix();
-		
-		if (eHMaterial) {
-			gl.glDisable(GL.GL_LIGHTING);
-		}
-		
-		 float size = 1;
-		 atualizarBBox(size);
 	}
 	
 	public void randomPosition(double tx, double ty, double tz){

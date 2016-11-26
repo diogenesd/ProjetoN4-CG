@@ -4,6 +4,7 @@ package n4;
  * https://www.opengl.org/sdk/docs/man2/xhtml/
  */
 
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 
 import com.sun.opengl.util.GLUT;
+import com.sun.opengl.util.j2d.TextRenderer;
 
 public class Main implements GLEventListener, KeyListener{
 	private GL gl;
@@ -31,6 +33,11 @@ public class Main implements GLEventListener, KeyListener{
     
     private final Set<Integer> pressed = new HashSet<>();
 	private World mundo;
+	
+	private boolean paused;
+    private boolean start;
+    
+    private TextRenderer renderer;
 
 	public void init(GLAutoDrawable drawable) {
 		glDrawable = drawable;
@@ -48,6 +55,10 @@ public class Main implements GLEventListener, KeyListener{
 		
 		// ILUMINACAO
 		ligarLuz();
+		
+		paused = true;
+        start = true;
+		
 		
 	    gl.glEnable(GL.GL_CULL_FACE);
 //	    gl.glDisable(GL.GL_CULL_FACE);	// DEFAULT OFF
@@ -103,22 +114,29 @@ public class Main implements GLEventListener, KeyListener{
 		        		0.0f, 1.0f, 0.0f);
         }
         
-        // CAMERA GIRAR
-        //this.cameraTemp.drawn();
+    	gl.glPushMatrix();
+    	
+		        if (paused) {
+		            pause(start);
+		        } else if (mundo.getStarShip().isAtivo()) {
+		            
+		        	// CAMERA GIRAR
+		            //this.cameraTemp.drawn();
+		            
+		            // DESENHA ESPAÇO
+		    		drawAxis();
+		    		
+		    		// DESENHA MUNDO
+		    		mundo.desenha();
+		    		
+		    		// ATUALIZA OS EVENTOS 		
+		    		updateEvents();
+		        	
+		        	
+		        } else {
+		            fim();
+		        }
         
-        // DESENHA ESPAÇO
-		drawAxis();
-		
-		// DESENHA MUNDO
-		mundo.desenha();
-		
-		// ATUALIZA OS EVENTOS 		
-		updateEvents();
-		
-		gl.glPushMatrix();
-		
-					    
-		    
 		gl.glPopMatrix();	
 		gl.glFlush();
 	}
@@ -134,71 +152,84 @@ public class Main implements GLEventListener, KeyListener{
 	}
 
 	public synchronized void keyPressed(KeyEvent e) {
-
-		pressed.add(e.getKeyCode());
-
-		switch (e.getKeyCode()) {
 		
-		// CHANGE CAMERA
-		case KeyEvent.VK_C:
-			changeCam();
-		break;
-		
-		// CHANGE COLOR MATERIAL
-		case KeyEvent.VK_M:
-			eHMaterial = !eHMaterial;
-			ligarLuz();
-		break;
-		
-		// SHOW MATRIX STARTSHIP
-		case KeyEvent.VK_1:
-			mundo.getStarShip().showMatrix();
-		break;
-		
-		// SHOW BBOX
-		case KeyEvent.VK_B:
-			showBbox = !showBbox;
-			System.out.println("ASTEROID");
-			mundo.getAsteroids().get(0).showBbox();
-			System.out.println("STARSHIP");
-			mundo.getStarShip().showBbox();
-		break;
-		
-		// MOVE CAM UP
-		case KeyEvent.VK_W:
-			System.out.println("	-- VK_W --	");
-			this.cameraPrincipal.translacaoXYZ(0.0f, 0.0f, 1.0f);
-			break;
-		// MOVE CAM UP
-		case KeyEvent.VK_S:
-			System.out.println("	-- VK_S --	");
-			this.cameraPrincipal.translacaoXYZ(0.0f, 0.0f, -1.0f);
-			break;
-		// MOVE CAM RIGHT
-		case KeyEvent.VK_D:
-			System.out.println("	-- VK_D --	");
-			this.cameraPrincipal.translacaoXYZ(1.0f, 0.0f, 0.0f);
-			break;
-		// MOVE CAM RIGHT
-		case KeyEvent.VK_A:
-			System.out.println("	-- VK_E --	");
-			this.cameraPrincipal.translacaoXYZ(-1.0f, 0.0f, 0.0f);
-			break;
-		
-		// MOVE CAM RIGHT
-		case KeyEvent.VK_L:
-			System.out.println("	-- VK_L --	");
-			mundo.getStarShip().loop(glDrawable);
+		if (!paused) {
+			pressed.add(e.getKeyCode());
+			
+			switch (e.getKeyCode()) {
+			
+			// CHANGE CAMERA
+			case KeyEvent.VK_C:
+				changeCam();
 			break;
 			
-		// MOVE CAM RIGHT
-		case KeyEvent.VK_P:
-			System.out.println("	-- VK_P --	");
-			new animacao("").start();
+			// CHANGE COLOR MATERIAL
+			case KeyEvent.VK_M:
+				eHMaterial = !eHMaterial;
+				ligarLuz();
 			break;
-		}
+			
+			// SHOW MATRIX STARTSHIP
+			case KeyEvent.VK_1:
+				mundo.getStarShip().showMatrix();
+			break;
+			
+			// SHOW BBOX
+			case KeyEvent.VK_B:
+				showBbox = !showBbox;
+				System.out.println("ASTEROID");
+				mundo.getAsteroids().get(0).showBbox();
+				System.out.println("STARSHIP");
+				mundo.getStarShip().showBbox();
+			break;
+			
+			// MOVE CAM UP
+			case KeyEvent.VK_W:
+				System.out.println("	-- VK_W --	");
+				this.cameraPrincipal.translacaoXYZ(0.0f, 0.0f, 1.0f);
+				break;
+			// MOVE CAM UP
+			case KeyEvent.VK_S:
+				System.out.println("	-- VK_S --	");
+				this.cameraPrincipal.translacaoXYZ(0.0f, 0.0f, -1.0f);
+				break;
+			// MOVE CAM RIGHT
+			case KeyEvent.VK_D:
+				System.out.println("	-- VK_D --	");
+				this.cameraPrincipal.translacaoXYZ(1.0f, 0.0f, 0.0f);
+				break;
+			// MOVE CAM RIGHT
+			case KeyEvent.VK_A:
+				System.out.println("	-- VK_E --	");
+				this.cameraPrincipal.translacaoXYZ(-1.0f, 0.0f, 0.0f);
+				break;
+			
+			// MOVE CAM RIGHT
+			case KeyEvent.VK_L:
+				System.out.println("	-- VK_L --	");
+				mundo.getStarShip().loop(glDrawable);
+				break;
+				
+			// MOVE CAM RIGHT
+			case KeyEvent.VK_R:
+				System.out.println("	-- VK_R --	");
+				new animacao("").start();
+				break;
+				
+			case KeyEvent.VK_P:
+				System.out.println("	-- VK_P --	");
+				paused = true;
+				break;	
+				
+			}
 
-		glDrawable.display();
+			glDrawable.display();
+			
+        } else {
+        	
+            unpause();
+        }
+
 	}
 	
 	@Override
@@ -398,5 +429,60 @@ public class Main implements GLEventListener, KeyListener{
 			}
 		}
 	}
+	
+	 private void pause(boolean start) {
+
+	        Cor corFundo = Cor.BLACK;
+	        gl.glClearColor(corFundo.getR(), corFundo.getG(), corFundo.getB(), corFundo.getA());
+
+	        String text = "Press any key to ";
+	        int width = glDrawable.getWidth();
+	        int height = glDrawable.getHeight();
+	        int x;
+	        int y = height / 6;
+	        if (start) {
+	            text += "start";
+	            x = width / 6;
+	        } else {
+	            text += "continue";
+	            x = width / 11;
+	        }
+
+	        renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, width / 15), true, true);
+	        renderer.beginRendering(width, height);
+	        renderer.setSmoothing(true);
+	        Cor cor = Cor.WHITE;
+	        renderer.setColor(cor.getR(), cor.getG(), cor.getB(), cor.getA());
+	        renderer.draw(text, x, y);
+	        renderer.endRendering();
+	        
+	    }
+
+	    private void unpause() {
+	        paused = false;
+	        start = false;
+	    }
+	    
+	    private void fim() {
+
+	        Cor corFundo = Cor.BLACK;
+	        gl.glClearColor(corFundo.getR(), corFundo.getG(), corFundo.getB(), corFundo.getA());
+
+	        String text = " Game Over!";
+	        int width = glDrawable.getWidth();
+	        int height = glDrawable.getHeight();
+	        int x;
+	        int y = height / 2;
+	        x = width / 2;
+
+	        renderer = new TextRenderer(new Font("SansSerif", Font.BOLD, width / 15), true, true);
+	        renderer.beginRendering(width, height);
+	        renderer.setSmoothing(true);
+	        Cor cor = Cor.WHITE;
+	        renderer.setColor(cor.getR(), cor.getG(), cor.getB(), cor.getA());
+	        renderer.draw(text, x, y);
+	        renderer.endRendering();
+	        
+	    }
 	
 }
