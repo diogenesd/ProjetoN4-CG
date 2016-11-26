@@ -7,6 +7,8 @@ import javax.media.opengl.GLAutoDrawable;
 
 import com.sun.opengl.util.GLUT;
 
+import object.OBJModel;
+
 public class StarShip extends ObjetoGrafico{
 	 
 	private boolean eHMaterial = true;
@@ -20,6 +22,11 @@ public class StarShip extends ObjetoGrafico{
 	private boolean ativo;
 	private ArrayList<Bullet> bullets;
 	
+	   //armazena o modelo utilizado
+    protected OBJModel[] loader = new OBJModel[7];
+    //informa qual objeto esta sendo mostrado na tela
+    protected int indexOBJ = 0;
+	
 	public StarShip(GL gl, GLUT glut) {
 		super();
 		bBox = new BoundingBox();
@@ -28,6 +35,8 @@ public class StarShip extends ObjetoGrafico{
 		
 		bullets = new ArrayList<Bullet>();
 		this.ativo = true;
+        loader[0] = new OBJModel("data/Xwing", 1.5f, gl, true);
+
 		
 	}
 	
@@ -80,7 +89,8 @@ public class StarShip extends ObjetoGrafico{
 			gl.glMultMatrixd(matrixObject.GetDate(), 0);
 			gl.glTranslated(0.0f, 0.0f, 0.0f);
 			gl.glScalef(size, size, size);
-			glut.glutSolidCube(2.0f);
+			//glut.glutSolidCube(2.0f);
+            loader[indexOBJ].draw(gl);
 			gl.glPopMatrix();
 
 			if (eHMaterial) {
