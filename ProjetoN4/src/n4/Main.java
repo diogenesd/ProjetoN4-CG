@@ -83,6 +83,14 @@ public class Main implements GLEventListener, KeyListener{
 		//glu.gluLookAt(xEye, yEye, zEye, xCenter, yCenter, zCenter, 0.0f, 1.0f, 0.0f);
         
         if(camFocoPrincipal){
+        	
+        	this.cameraPrincipal.setxEye(mundo.getStarShip().getMatrixObject().GetElement(12));
+	        //this.cameraPrincipal.setyEye();
+	        this.cameraPrincipal.setzEye(mundo.getStarShip().getMatrixObject().GetElement(14));
+	        this.cameraPrincipal.setxCenter(mundo.getStarShip().getMatrixObject().GetElement(12));
+	        this.cameraPrincipal.setyCenter(mundo.getStarShip().getMatrixObject().GetElement(13));
+	        this.cameraPrincipal.setzCenter(0.0f);
+        	
         glu.gluLookAt(this.cameraPrincipal.getxEye(), // Configuração da camera no viewPort
         		this.cameraPrincipal.getyEye(),
         		this.cameraPrincipal.getzEye(),
@@ -91,20 +99,13 @@ public class Main implements GLEventListener, KeyListener{
         		this.cameraPrincipal.getzCenter(),
         		0.0f, 1.0f, 0.0f);
         }else{
-		        /*this.cameraAux.setxEye(mundo.getStarShip().getMatrixObject().GetElement(12));
+		        this.cameraAux.setxEye(mundo.getStarShip().getMatrixObject().GetElement(12));
 		        this.cameraAux.setyEye(mundo.getStarShip().getMatrixObject().GetElement(13));
 		        this.cameraAux.setzEye(mundo.getStarShip().getMatrixObject().GetElement(14));
 		        this.cameraAux.setxCenter(mundo.getStarShip().getMatrixObject().GetElement(12));
 		        this.cameraAux.setyCenter(mundo.getStarShip().getMatrixObject().GetElement(13));
-		        this.cameraAux.setzCenter(mundo.getStarShip().getMatrixObject().GetElement(14) - 60);*/
-        		
-        		this.cameraAux.setxEye(cameraTemp.getMatrizObjeto().GetElement(12));
-        		this.cameraAux.setyEye(cameraTemp.getMatrizObjeto().GetElement(13));
-        		this.cameraAux.setzEye(cameraTemp.getMatrizObjeto().GetElement(14)+10);
-        		this.cameraAux.setxCenter(0.0f);
-		        this.cameraAux.setyCenter(0.0f);
-		        this.cameraAux.setzCenter(0.0f);
-        		
+		        this.cameraAux.setzCenter(mundo.getStarShip().getMatrixObject().GetElement(14) - 60);
+        	
 		        glu.gluLookAt(this.cameraAux.getxEye(), // Configuração da camera no viewPort
 		        		this.cameraAux.getyEye(),
 		        		this.cameraAux.getzEye(),
@@ -221,6 +222,13 @@ public class Main implements GLEventListener, KeyListener{
 				paused = true;
 				break;	
 				
+			// BULLET
+			case KeyEvent.VK_F:
+				System.out.println("	-- VK_F --	");
+				if (mundo != null && mundo.getStarShip() != null) {
+					mundo.addBUllets(mundo.getStarShip());
+				}
+				break;	
 			}
 
 			glDrawable.display();
@@ -327,15 +335,6 @@ public class Main implements GLEventListener, KeyListener{
 				System.out.println("	-- (L)to: -1.0, 0.0, 0.0--	");
 			}
 		}
-		
-		// BULLET
-		if (pressed.contains(KeyEvent.VK_F)) {
-			System.out.println("	-- VK_F --	");
-			if (mundo != null && mundo.getStarShip() != null) {
-				mundo.addBUllets(mundo.getStarShip());
-			}
-		}
-
 	}
 	
 	

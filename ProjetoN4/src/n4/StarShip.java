@@ -17,7 +17,7 @@ public class StarShip extends ObjetoGrafico{
 	public Transformacao4D matrixObject = new Transformacao4D();
 	private double speed = 0.3f;
 	private float size = 1.0f;
-	private boolean ativo = true;
+	private boolean ativo;
 	private ArrayList<Bullet> bullets;
 	
 	public StarShip(GL gl, GLUT glut) {
@@ -27,6 +27,7 @@ public class StarShip extends ObjetoGrafico{
 		this.glut = glut;
 		
 		bullets = new ArrayList<Bullet>();
+		this.ativo = true;
 		
 	}
 	

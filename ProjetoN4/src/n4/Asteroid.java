@@ -18,7 +18,7 @@ public class Asteroid extends ObjetoGrafico{
 	private n4.BoundingBox bBox;
 	public Transformacao4D matrixObject = new Transformacao4D();
 	
-	private boolean ativo = true;
+	private boolean ativo;
 	private static final float speed = 0.05f;
 	private float moveAsteroid;
 	private float size = 1.5f;
@@ -30,6 +30,7 @@ public class Asteroid extends ObjetoGrafico{
 		bBox = new n4.BoundingBox();
 		this.gl = gl;
 		this.glut = glut;
+		this.ativo = true;
 	}
 
 	public void drawBbox() {
@@ -88,9 +89,8 @@ public class Asteroid extends ObjetoGrafico{
 			if (eHMaterial) {
 				gl.glDisable(GL.GL_LIGHTING);
 			}
-			
-			atualizarBBox(size);
 			moveDown();
+			atualizarBBox(size);
 		}
 	}
 	

@@ -1,6 +1,8 @@
 package n4;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
@@ -16,9 +18,8 @@ public class World {
 	private GLUT glut;
 	private GLAutoDrawable glDrawable;
 	
-	
-	private ArrayList<ObjetoGrafico> objetos;
-	private ArrayList<ObjetoGrafico> objetosInativos;
+	private Set<ObjetoGrafico> objetos;
+	private Set<ObjetoGrafico> objetosInativos;
 	private ArrayList<Asteroid> asteroids;
 	private Espaco espaco;
 	private StarShip starShip;
@@ -33,8 +34,8 @@ public class World {
 		
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		
-		objetos = new ArrayList<>();
-		objetosInativos = new ArrayList<>();
+		objetos = new HashSet<>();
+		objetosInativos = new HashSet<>();
 		asteroids = new ArrayList<>();
 		
 		espaco = new Espaco(gl);	
@@ -54,34 +55,38 @@ public class World {
 	
 	public void desenha() {
 		
-		if(!objetosInativos.isEmpty()){
+		if (!objetosInativos.isEmpty()) {
 			for (ObjetoGrafico objeto : objetosInativos) {
-				objeto.setAtivo(true);
 				objetos.remove(objeto);
 			}
 		}
-		if (!objetos.isEmpty()) {
-			for (ObjetoGrafico objeto : objetos) {
-				
-				if(objeto.isAtivo()){
-					
-					if(objeto instanceof Bullet){
-						Bullet b = (Bullet) objeto;
-						ArrayList<Asteroid> objc = b.checkColisao(asteroids);
-						if (!objc.isEmpty()) {
-							System.out.println(" COLISAO BULLET");
-							b.setExplodiu(true);
-							objetosInativos.add(b);
-							for (Asteroid asteroid : objc) {
-								objetosInativos.add(asteroid);
-							}
+		// limpar lista inativa
+		objetosInativos.clear();
+		
+		for (ObjetoGrafico objeto : objetos) {
+
+			System.out.println("tam: " + objetos.size());
+
+			if (objeto.isAtivo()) {
+
+				if (objeto instanceof Bullet) {
+					Bullet b = (Bullet) objeto;
+					ArrayList<Asteroid> objc = b.checkColisao(asteroids);
+					if (!objc.isEmpty()) {
+						System.out.println(" COLISAO BULLET");
+						b.setExplodiu(true);
+						objetosInativos.add(b);
+						for (ObjetoGrafico ob : objc) {
+							objetosInativos.add(ob);
+							asteroids.remove(ob);
 						}
 					}
-					 objeto.drawn();
-				
-				}else{
-					objetosInativos.add(objeto);
 				}
+
+				objeto.drawn();
+
+			} else {
+				objetosInativos.add(objeto);
 			}
 		}
 	}
@@ -101,11 +106,11 @@ public class World {
         }
     }
 	
-	public ArrayList<ObjetoGrafico> getObjetos() {
+	public Set<ObjetoGrafico> getObjetos() {
 		return objetos;
 	}
 
-	public void setObjetos(ArrayList<ObjetoGrafico> objetos) {
+	public void setObjetos(Set<ObjetoGrafico> objetos) {
 		this.objetos = objetos;
 	}
 	

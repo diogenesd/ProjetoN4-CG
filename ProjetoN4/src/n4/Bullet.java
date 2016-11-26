@@ -20,7 +20,7 @@ public class Bullet extends ObjetoGrafico{
 	public Transformacao4D matrixObject = new Transformacao4D();
 	private double speed = 0.2f;
 	private float size = 0.5f;
-	private boolean ativo = true;
+	private boolean ativo;
 	private boolean explodiu = false;
 	private int tempo;
 	 private Timer timer;
@@ -32,6 +32,7 @@ public class Bullet extends ObjetoGrafico{
 		this.glut = glut;
 	    tempo = 4;
 	    cor = corYellow;
+	    this.ativo = true;
 	    contador();
 	}
 	
