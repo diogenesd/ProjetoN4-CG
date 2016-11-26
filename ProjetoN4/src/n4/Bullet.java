@@ -1,6 +1,8 @@
 package n4;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.media.opengl.GL;
 
@@ -21,16 +23,16 @@ public class Bullet extends ObjetoGrafico{
 	private boolean ativo = true;
 	private boolean explodiu = false;
 	private int tempo;
-	private final int alcance;
+	 private Timer timer;
 	
 	public Bullet(GL gl, GLUT glut) {
 		super();
 		bBox = new n4.BoundingBox();
 		this.gl = gl;
 		this.glut = glut;
-		alcance = 3;
-	    tempo = 50;
+	    tempo = 4;
 	    cor = corYellow;
+	    contador();
 	}
 	
 	public void drawBbox() {
@@ -91,9 +93,10 @@ public class Bullet extends ObjetoGrafico{
 			
 			atualizarBBox(size);
 			moveBullet();
-		}else{
+		}else if(ativo && explodiu == true){
 			fire();
 		}
+		
 	}
 	public void fire() {
     	if (eHMaterial) {
@@ -130,7 +133,6 @@ public class Bullet extends ObjetoGrafico{
 		Transformacao4D mL = new Transformacao4D();
 		mL.atribuirTranslacao(0.0f, 0.0f, -speed);
 		matrixObject = mL.transformMatrix(matrixObject);
-		System.out.println("Moveu bullet");
 	}
 	public void moveDown(){
 		Transformacao4D mL = new Transformacao4D();
@@ -180,15 +182,33 @@ public class Bullet extends ObjetoGrafico{
         }
         return colisionObj;
     }
+	
+	 public final void contador() {
+	        timer = new Timer();
+	        timer.scheduleAtFixedRate(new TimerTask() {
+	            @Override
+	            public void run() {
+	                setTempo();
 
+	            }
+	        }, 1000, 1000);
+	    }
+
+	    private int setTempo() {
+	        switch (tempo) {
+	            case 1:
+	            	setAtivo(false);
+	                timer.cancel();
+	                break;
+	        }
+	        return --tempo;
+	    }
+	
+	
     public boolean explodiu() {
         return tempo == 0;
     }
 
-    public int getAlcance() {
-        return alcance;
-    }
-	
 	public void showMatrix() {
 		matrixObject.exibeMatriz();
 	}
@@ -250,6 +270,15 @@ public class Bullet extends ObjetoGrafico{
 
 	public void setAtivo(boolean ativo) {
 		this.ativo = ativo;
+	}
+	
+	
+	public boolean isExplodiu() {
+		return explodiu;
+	}
+
+	public void setExplodiu(boolean explodiu) {
+		this.explodiu = explodiu;
 	}
 
 	public void moveBullet() {

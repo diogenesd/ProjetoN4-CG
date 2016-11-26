@@ -17,4 +17,9 @@ public abstract class ObjetoGrafico {
 	public abstract void moveUp();
 	
 	public abstract void moveDown();
+	
+	public abstract boolean isAtivo();
+	
+	public abstract void setAtivo(boolean ativo);
+	
 }

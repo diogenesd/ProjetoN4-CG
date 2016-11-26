@@ -18,6 +18,7 @@ public class Asteroid extends ObjetoGrafico{
 	private n4.BoundingBox bBox;
 	public Transformacao4D matrixObject = new Transformacao4D();
 	
+	private boolean ativo = true;
 	private static final float speed = 0.3f;
 	private float moveAsteroid;
 	private float size = 1.0f;
@@ -207,6 +208,16 @@ public class Asteroid extends ObjetoGrafico{
 	@Override
 	public void drawn() {
 		drawAsteroid();
+	}
+
+	@Override
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	@Override
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	

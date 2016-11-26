@@ -3,6 +3,7 @@ package n4;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLAutoDrawable;
 
 import com.sun.opengl.util.GLUT;
 
@@ -172,6 +173,16 @@ public class StarShip extends ObjetoGrafico{
 		// ATRIBUI ALTERAÇÕES PARA A MATRIZ DESTE OBJETO
 		matrixObject = matrizScale.transformMatrix(matrixObject);
 	}
+	public void loop(GLAutoDrawable glDrawable) {
+		new animacao(glDrawable).start();
+	}
+	public void giraX(double angulo) {
+		Transformacao4D matrizRotacaoY = new Transformacao4D();		
+		matrizRotacaoY.atribuirRotacaoX(Transformacao4D.DEG_TO_RAD * angulo);
+		matrixObject = matrizRotacaoY.transformMatrix(matrixObject);
+	}
+	
+	
 	public boolean colision(Asteroid asteroid) {
 
         if ((obterMaiorX() > asteroid.obterMenorX() && obterMenorX() < asteroid.obterMenorX()
@@ -282,6 +293,25 @@ public class StarShip extends ObjetoGrafico{
 		
 	}
 	
-	
+	class animacao extends Thread {
+		
+	    private GLAutoDrawable drawable;
+		public animacao(GLAutoDrawable glDrawable) {
+	    	super();
+	    	drawable = glDrawable;
+	    }
+	    public void run() {
+	    	Transformacao4D mL = new Transformacao4D();
+	    	mL.SetData(getMatrixObject().GetDate());
+	    	for (int i = 0; i < 360; i++) {
+	    		giraX(1);
+	    		drawable.display();
+			}
+	    	corrigi(mL);
+	    }
+		private void corrigi(Transformacao4D mL) {
+			matrixObject.SetData(mL.GetDate());;
+		}
+	}
 	
 }

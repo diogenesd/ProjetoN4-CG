@@ -18,6 +18,7 @@ public class World {
 	
 	
 	private ArrayList<ObjetoGrafico> objetos;
+	private ArrayList<ObjetoGrafico> objetosInativos;
 	private ArrayList<Asteroid> asteroids;
 	private Espaco espaco;
 	private StarShip starShip;
@@ -33,6 +34,7 @@ public class World {
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		
 		objetos = new ArrayList<>();
+		objetosInativos = new ArrayList<>();
 		asteroids = new ArrayList<>();
 		
 		espaco = new Espaco(gl);	
@@ -51,9 +53,35 @@ public class World {
 	}
 	
 	public void desenha() {
+		
+		if(!objetosInativos.isEmpty()){
+			for (ObjetoGrafico objeto : objetosInativos) {
+				objeto.setAtivo(true);
+				objetos.remove(objeto);
+			}
+		}
 		if (!objetos.isEmpty()) {
 			for (ObjetoGrafico objeto : objetos) {
-				 objeto.drawn();
+				
+				if(objeto.isAtivo()){
+					
+					if(objeto instanceof Bullet){
+						Bullet b = (Bullet) objeto;
+						ArrayList<Asteroid> objc = b.checkColisao(asteroids);
+						if (!objc.isEmpty()) {
+							System.out.println(" COLISAO BULLET");
+							b.setExplodiu(true);
+							objetosInativos.add(b);
+							for (Asteroid asteroid : objc) {
+								objetosInativos.add(asteroid);
+							}
+						}
+					}
+					 objeto.drawn();
+				
+				}else{
+					objetosInativos.add(objeto);
+				}
 			}
 		}
 	}

@@ -10,6 +10,7 @@ public class Espaco extends ObjetoGrafico {
 	private float size = 200.0f;
 	private double speed = 0.3f;
 	private Texture texture;
+	private boolean  ativo = true;
 
 	public Espaco(GL gl) {
 		super();
@@ -223,6 +224,16 @@ public class Espaco extends ObjetoGrafico {
 	@Override
 	public void drawn() {
 		drawSpace();
+	}
+
+	@Override
+	public boolean isAtivo() {
+		return  ativo ;
+	}
+
+	@Override
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 }

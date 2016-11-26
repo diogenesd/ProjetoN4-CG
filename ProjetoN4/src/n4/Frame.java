@@ -43,7 +43,6 @@ public class Frame extends JFrame{
 		add(canvas,BorderLayout.CENTER);
 		canvas.addGLEventListener(renderer);        
 		canvas.addKeyListener(renderer);
-		canvas.addMouseListener(renderer);
 		canvas.requestFocus();	
 	    final Animator animator = new Animator(canvas);
 	    animator.start();
