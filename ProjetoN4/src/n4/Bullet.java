@@ -18,7 +18,7 @@ public class Bullet extends ObjetoGrafico{
 	private float[] cor;
 	private BoundingBox bBox;
 	public Transformacao4D matrixObject = new Transformacao4D();
-	private double speed = 0.2f;
+	private double speed = 0.55f;
 	private float size = 0.5f;
 	private boolean ativo;
 	private boolean explodiu = false;

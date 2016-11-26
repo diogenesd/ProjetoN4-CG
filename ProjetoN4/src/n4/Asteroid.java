@@ -1,5 +1,7 @@
 package n4;
 
+import java.util.Random;
+
 import javax.media.opengl.GL;
 
 import com.sun.opengl.util.GLUT;
@@ -19,9 +21,10 @@ public class Asteroid extends ObjetoGrafico{
 	public Transformacao4D matrixObject = new Transformacao4D();
 	
 	private boolean ativo;
-	private static final float speed = 0.05f;
+	private static float speed;
 	private float moveAsteroid;
 	private float size = 1.5f;
+	private Random random;
 	
 	
 	
@@ -31,6 +34,8 @@ public class Asteroid extends ObjetoGrafico{
 		this.gl = gl;
 		this.glut = glut;
 		this.ativo = true;
+		this.random = new Random();
+		setSpeed();
 	}
 
 	public void drawBbox() {
@@ -222,6 +227,9 @@ public class Asteroid extends ObjetoGrafico{
 		this.ativo = ativo;
 	}
 
+	public void setSpeed(){
+		this.speed = random.nextFloat()+0.1f;
+	}
 	
 	
 }
