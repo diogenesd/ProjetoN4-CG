@@ -35,7 +35,8 @@ public class StarShip extends ObjetoGrafico{
 		
 		bullets = new ArrayList<Bullet>();
 		this.ativo = true;
-        loader[0] = new OBJModel("data/Xwing", 1.5f, gl, true);
+        loader[0] = new OBJModel("data/XWing", 1.5f, gl, true);
+        // nome correto p/ referencia qnd descobrir o problema do mtl: XWingLow-MediumPolyByPixelOzMultiMaterialColoredVer1-0
 
 		
 	}
