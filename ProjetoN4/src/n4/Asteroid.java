@@ -88,7 +88,7 @@ public class Asteroid extends ObjetoGrafico{
 				gl.glMultMatrixd(matrixObject.GetDate(), 0);
 				gl.glTranslated(0.0f, 0.0f, 0.0f);
 				gl.glScalef( size , size, size);
-				glut.glutSolidCube(size);//glut.glutSolidSphere(1.0f, 360, 360);	
+			glut.glutSolidOctahedron();	//glut.glutSolidCube(size);//glut.glutSolidSphere(1.0f, 360, 360);	
 			gl.glPopMatrix();
 			
 			if (eHMaterial) {
@@ -228,7 +228,7 @@ public class Asteroid extends ObjetoGrafico{
 	}
 
 	public void setSpeed(){
-		this.speed = random.nextFloat()+0.1f;
+		this.speed = random.nextFloat();
 	}
 	
 	

@@ -147,7 +147,7 @@ public class World {
     			a.translacaoXYZ(pos += r.nextInt(60), 0.0f, -60.f);
     			
             }
-        }, 1000, 5000);
+        }, 1000, 1000);
     }
 	
 }
