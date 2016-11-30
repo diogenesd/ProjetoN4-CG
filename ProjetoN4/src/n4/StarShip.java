@@ -18,7 +18,7 @@ public class StarShip extends ObjetoGrafico{
 	private BoundingBox bBox;
 	public Transformacao4D matrixObject = new Transformacao4D();
 	private double speed = 0.3f;
-	private float size = 1.0f;
+	private float size = 3.0f;
 	private boolean ativo;
 	private ArrayList<Bullet> bullets;
 	

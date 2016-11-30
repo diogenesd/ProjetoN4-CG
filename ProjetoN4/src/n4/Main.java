@@ -86,7 +86,7 @@ public class Main implements GLEventListener, KeyListener{
         	
         	this.cameraPrincipal.setxEye(mundo.getStarShip().getMatrixObject().GetElement(12));
 	        //this.cameraPrincipal.setyEye();
-	        this.cameraPrincipal.setzEye(mundo.getStarShip().getMatrixObject().GetElement(14));
+	        this.cameraPrincipal.setzEye(mundo.getStarShip().getMatrixObject().GetElement(14)+10);
 	        this.cameraPrincipal.setxCenter(mundo.getStarShip().getMatrixObject().GetElement(12));
 	        this.cameraPrincipal.setyCenter(mundo.getStarShip().getMatrixObject().GetElement(13));
 	        this.cameraPrincipal.setzCenter(0.0f);
