@@ -125,7 +125,7 @@ public class Main implements GLEventListener, KeyListener{
 		            //this.cameraTemp.drawn();
 		            
 		            // DESENHA ESPAÇO
-		    		drawAxis();
+		    		//drawAxis();
 		    		
 		    		// DESENHA MUNDO
 		    		mundo.desenha();

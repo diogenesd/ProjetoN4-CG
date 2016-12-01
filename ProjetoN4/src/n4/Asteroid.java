@@ -228,7 +228,16 @@ public class Asteroid extends ObjetoGrafico{
 	}
 
 	public void setSpeed(){
-		this.speed = random.nextFloat();
+		float auxSpeed = random.nextFloat();
+		if (auxSpeed > 0.8f){
+			auxSpeed -= 0.2f;
+		} else {
+			if (auxSpeed <= 0.1f){
+				auxSpeed += 0.2f;
+			}
+		}
+		
+		this.speed = auxSpeed;
 	}
 	
 	

@@ -144,10 +144,10 @@ public class World {
             	int pos = -30;
             	Asteroid a = new Asteroid(gl, glut);
     			asteroids.add(a);
-    			a.translacaoXYZ(pos += r.nextInt(60), 0.0f, -60.f);
+    			a.translacaoXYZ(pos += r.nextInt(40), 0.0f, -60.f);
     			
             }
-        }, 1000, 1000);
+        }, 400, 1000);
     }
 	
 }
